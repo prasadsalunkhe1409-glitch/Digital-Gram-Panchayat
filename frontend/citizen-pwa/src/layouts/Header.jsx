@@ -1,14 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Moon, Sun, Wifi, WifiOff, Bell, Settings, HelpCircle } from 'lucide-react';
+import { Wifi, WifiOff, Bell, Settings, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTheme, useLanguage } from '@/store';
+import { useLanguage } from '@/store';
 import { useOnline } from '@/hooks/useOnline';
 import { useUnreadCount } from '@/features/notifications/hooks';
 
 export function Header() {
   const { t } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
   const isOnline = useOnline();
   const { data: unread = 0 } = useUnreadCount();
@@ -44,15 +43,6 @@ export function Header() {
           aria-label={t('nav.toggleLanguage')}
         >
           {language === 'mr' ? 'EN' : 'मर'}
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          aria-label={t(theme === 'dark' ? 'nav.themeLight' : 'nav.themeDark')}
-        >
-          {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>
 
         <Button asChild variant="ghost" size="icon" aria-label={t('help.title')}>

@@ -6,15 +6,10 @@ import {
   Landmark,
   FileText,
   Receipt,
-  Users,
-  BadgeCheck,
-  Bell,
   Gavel,
   HardHat,
   Vote,
-  Download,
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { SectionHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { NoEventsArt, NoNoticesArt, NoSchemesArt } from '@/components/Illustration';
@@ -25,9 +20,8 @@ import { useMyTax } from '@/features/tax/hooks';
 import { useNotices } from '@/features/notices/hooks';
 import { useSchemes } from '@/features/schemes/hooks';
 import { useVillageProfile, useVillageEvents } from '@/features/village/hooks';
-import { sortMembers } from '@/features/village/members';
-import { OfficialCard } from '@/features/village/OfficialCard';
 import { TimetableSection } from '@/features/timetable/TimetableSection';
+import { ServiceCard } from '@/features/home/ServiceCard';
 import { NoticeCard } from '@/features/notices/components/NoticeCard';
 import { SchemeCard } from '@/features/schemes/components/SchemeCard';
 import { useUnreadCount } from '@/features/notifications/hooks';
@@ -35,25 +29,33 @@ import { VillageHero } from '@/features/home/VillageHero';
 import { GlobalSearch } from '@/features/home/GlobalSearch';
 import { PriorityBoard } from '@/features/home/PriorityBoard';
 import { VillageStats } from '@/features/home/VillageStats';
-import { EmergencyContacts } from '@/features/home/EmergencyContacts';
 import { EventCard, daysUntil } from '@/features/home/EventCard';
 import { useMeetings, useProjects, useDownloads } from '@/features/governance/hooks';
 
 // Quick services — every entry point a citizen has. The last four are the governance modules
 // that give someone a reason to open this weekly rather than only when they need a document.
+/*
+ * The services a citizen acts on.
+ *
+ * Directory, Verify, Alerts and Downloads have gone from this grid. They were reference
+ * surfaces sitting among things you *do* — the directory is now public and on the home page
+ * before login, and the rest stay reachable by their routes without taking a tile here.
+ * Nothing was deleted from the backend; these are navigation decisions.
+ */
 const SERVICES = [
-  { to: '/complaints/new', label: 'nav.complaints', icon: ClipboardList },
-  { to: '/dakhala', label: 'nav.dakhala', icon: FileText },
-  { to: '/tax', label: 'nav.tax', icon: Receipt },
-  { to: '/schemes', label: 'nav.schemes', icon: Landmark },
-  { to: '/notices', label: 'nav.notices', icon: Megaphone },
-  { to: '/directory', label: 'nav.directory', icon: Users },
-  { to: '/verify', label: 'nav.verify', icon: BadgeCheck },
-  { to: '/notifications', label: 'nav.notifications', icon: Bell },
-  { to: '/meetings', label: 'nav.meetings', icon: Gavel },
-  { to: '/projects', label: 'nav.projects', icon: HardHat },
-  { to: '/polls', label: 'nav.polls', icon: Vote },
-  { to: '/downloads', label: 'nav.downloads', icon: Download },
+  {
+    to: '/complaints/new',
+    label: 'nav.complaints',
+    desc: 'home.svc.complaints',
+    icon: ClipboardList,
+  },
+  { to: '/dakhala', label: 'nav.dakhala', desc: 'home.svc.dakhala', icon: FileText },
+  { to: '/tax', label: 'nav.tax', desc: 'home.svc.tax', icon: Receipt },
+  { to: '/schemes', label: 'nav.schemes', desc: 'home.svc.schemes', icon: Landmark },
+  { to: '/notices', label: 'nav.notices', desc: 'home.svc.notices', icon: Megaphone },
+  { to: '/meetings', label: 'nav.meetings', desc: 'home.svc.meetings', icon: Gavel },
+  { to: '/projects', label: 'nav.projects', desc: 'home.svc.projects', icon: HardHat },
+  { to: '/polls', label: 'nav.polls', desc: 'home.svc.polls', icon: Vote },
 ];
 
 export function Home() {
@@ -86,8 +88,6 @@ export function Home() {
   // Anything happening today or tomorrow belongs in the "today" band, not further down.
   const imminentEvent = events.find((e) => daysUntil(e.startDate) <= 1);
 
-  const contacts = profile?.emergencyContacts ?? [];
-  const officials = sortMembers(profile?.members ?? []).slice(0, 6);
   const firstName = user?.fullName?.split(' ')[0];
 
   return (
@@ -161,20 +161,16 @@ export function Home() {
       {/* 4 — quick services */}
       <section aria-labelledby="qs-h">
         <SectionHeader id="qs-h" title={t('home.services')} />
-        <div className="grid grid-cols-4 gap-2.5 sm:grid-cols-6 lg:grid-cols-12">
-          {SERVICES.map(({ to, label, icon: Icon }) => (
-            <Link
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {SERVICES.map(({ to, label, desc, icon }) => (
+            <ServiceCard
               key={label}
               to={to}
-              className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-2 text-center shadow-xs transition-[box-shadow,transform,border-color] duration-150 hover:border-primary/40 hover:shadow-sm active:translate-y-px"
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-subtle">
-                <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
-              </span>
-              <span className="text-caption font-medium leading-tight text-foreground">
-                {t(label)}
-              </span>
-            </Link>
+              icon={icon}
+              title={t(label)}
+              description={t(desc)}
+              cta={t('home.svc.open')}
+            />
           ))}
         </div>
       </section>
@@ -184,45 +180,7 @@ export function Home() {
           they look up once. */}
       <TimetableSection />
 
-      {/* 6 — who runs the village */}
-      <section aria-labelledby="officials-h">
-        <SectionHeader
-          id="officials-h"
-          title={t('directory.officials')}
-          action={
-            <Link
-              to="/directory"
-              className="rounded-md px-1 py-0.5 text-caption font-medium text-primary transition-colors duration-150 hover:text-primary-hover"
-            >
-              {t('directory.viewAll')}
-            </Link>
-          }
-        />
-        {officials.length ? (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {officials.map((m) => (
-              <OfficialCard key={m.id} member={m} variant="compact" />
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-subtle text-primary">
-                <Users className="h-6 w-6" aria-hidden="true" />
-              </span>
-              <p className="text-body text-muted-foreground">{t('directory.willUpdate')}</p>
-              <Link
-                to="/directory"
-                className="text-caption font-medium text-primary hover:text-primary-hover"
-              >
-                {t('directory.viewAll')}
-              </Link>
-            </div>
-          </Card>
-        )}
-      </section>
-
-      {/* 7 — the village in numbers */}
+      {/* 6 — the village in numbers */}
       <VillageStats statistics={profile?.statistics} />
 
       {/* 7 + 8 — notices and schemes, side by side on desktop */}
@@ -275,9 +233,6 @@ export function Home() {
           )}
         </section>
       </div>
-
-      {/* 8 — emergency */}
-      <EmergencyContacts contacts={contacts} />
     </div>
   );
 }

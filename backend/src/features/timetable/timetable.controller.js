@@ -2,9 +2,15 @@ import { successResponse } from '@dgp/shared';
 import { asyncHandler } from '../../utils/async-handler.js';
 import * as service from './timetable.service.js';
 
-/** GET /api/v1/timetable — the published schedule, grouped by service. */
-export const publicTimetable = asyncHandler(async (_req, res) => {
-  res.status(200).json(successResponse(await service.publicTimetable()));
+/**
+ * GET /api/v1/timetable — the published schedule, grouped by service.
+ *
+ * Public, and stays public. `attachUserIfPresent` means a signed-in citizen gets their own
+ * ward's rounds while an anonymous visitor still gets the village-wide schedule, without the
+ * page turning into a login wall.
+ */
+export const publicTimetable = asyncHandler(async (req, res) => {
+  res.status(200).json(successResponse(await service.publicTimetable(req.user?.ward ?? null)));
 });
 
 export const list = asyncHandler(async (req, res) => {

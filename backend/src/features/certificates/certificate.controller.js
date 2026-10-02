@@ -65,3 +65,16 @@ export const remove = asyncHandler(async (req, res) => {
   const result = await service.softDelete(req.params.id, req.user.id);
   res.status(200).json(successResponse(result));
 });
+
+/** POST /api/v1/admin/dakhala — officer records and issues a certificate directly. */
+export const officerCreate = asyncHandler(async (req, res) => {
+  res.status(201).json(
+    successResponse(
+      await service.createByOfficer({
+        officerId: req.user.id,
+        body: req.body,
+        files: req.files,
+      }),
+    ),
+  );
+});

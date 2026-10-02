@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { VALIDATION } from '@dgp/shared';
+import { VALIDATION, WARDS } from '@dgp/shared';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { FormField } from './FormField';
@@ -66,6 +66,15 @@ export function RegisterForm() {
         label={t('auth.address')}
         error={errors.address}
         register={register('address', { required: t('auth.required') })}
+      />
+      {/* A fixed list, not free text: the ward is what an officer filters by, and a typo
+          quietly removes the citizen from the list their own officer searches. */}
+      <FormField
+        label={t('auth.ward')}
+        placeholder={t('auth.wardPlaceholder')}
+        error={errors.ward}
+        options={WARDS}
+        register={register('ward', { required: t('auth.wardRequired') })}
       />
 
       <Button type="submit" className="w-full" loading={isSubmitting}>

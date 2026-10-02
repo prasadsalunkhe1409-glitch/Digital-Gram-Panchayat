@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileText } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import { CERT_TYPES_ALL, DAKHALA_STATUSES, formatDate } from '@dgp/shared';
 import { Select } from '@/components/ui/input';
 import { SkeletonRows } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
+import { Button } from '@/components/ui/button';
 import { FilterBar, SearchInput } from '@/components/FilterBar';
+import { WardFilter } from '@/components/WardFilter';
+import { AddCertificateDialog } from './AddCertificateDialog';
 import { Pagination } from '@/components/Pagination';
 import {
   TableShell,
@@ -30,14 +33,19 @@ export function CertificateList() {
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('');
   const [certificateType, setCertificateType] = useState('');
+  const [ward, setWard] = useState('');
+  const [addOpen, setAddOpen] = useState(false);
   const [page, setPage] = useState(1);
 
+  // Ward is resolved through the applicant on the server; historical applications carry no
+  // ward of their own and are not rewritten to.
   const params = {
     page,
     limit: LIMIT,
     ...(q ? { q } : {}),
     ...(status ? { status } : {}),
     ...(certificateType ? { certificateType } : {}),
+    ...(ward ? { ward } : {}),
   };
   const { data, isLoading, isError } = useApplications(params);
   const rows = data?.data ?? [];
@@ -51,10 +59,17 @@ export function CertificateList() {
 
   return (
     <div>
-      <h1 className="mb-4 text-title text-foreground">{t('dakhala.dash.title')}</h1>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-title text-foreground">{t('dakhala.dash.title')}</h1>
+        <Button onClick={() => setAddOpen(true)}>
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          {t('dakhala.add.title')}
+        </Button>
+      </div>
 
       <FilterBar>
         <SearchInput value={q} onChange={onFilter(setQ)} placeholder={t('dakhala.dash.search')} />
+        <WardFilter value={ward} onChange={onFilter(setWard)} variant="people" />
         <Select
           value={status}
           onChange={(e) => onFilter(setStatus)(e.target.value)}
@@ -136,6 +151,8 @@ export function CertificateList() {
           </TBody>
         </Table>
       </TableShell>
+
+      <AddCertificateDialog open={addOpen} onClose={() => setAddOpen(false)} />
 
       <Pagination
         page={page}

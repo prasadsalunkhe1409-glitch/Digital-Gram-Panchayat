@@ -1,31 +1,34 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 
 const STORAGE_KEY = 'dgp_theme';
 
 const ThemeContext = createContext(undefined);
 
-function getInitialTheme() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === 'light' || stored === 'dark') return stored;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
+/**
+ * The portal is light, always.
+ *
+ * It used to offer a dark theme, follow the operating system's preference and remember the
+ * choice. All three are gone: a government service reads as one thing to everybody, and the
+ * accessibility work behind the light palette was measured against the light surfaces only.
+ *
+ * The provider stays rather than being deleted so `data-theme` is still pinned explicitly —
+ * leaving the attribute off would let a future stylesheet's media query decide — and so any
+ * remaining consumer gets a defined value instead of throwing. It no longer exposes a setter:
+ * a stale `toggleTheme()` call now fails at build time rather than silently doing nothing.
+ */
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(getInitialTheme);
-
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme]);
+    document.documentElement.setAttribute('data-theme', 'light');
+    // Clear the remembered preference, so a browser that stored 'dark' before this change
+    // does not keep carrying it around in localStorage for no reason.
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Private mode or blocked storage: nothing to clean up, and nothing depends on it.
+    }
+  }, []);
 
-  const value = useMemo(
-    () => ({
-      theme,
-      setTheme: setThemeState,
-      toggleTheme: () => setThemeState((prev) => (prev === 'light' ? 'dark' : 'light')),
-    }),
-    [theme],
-  );
+  const value = useMemo(() => ({ theme: 'light' }), []);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

@@ -1,4 +1,5 @@
-import { ROLES, TIMETABLE_DAYS } from '@dgp/shared';
+import { ROLES, TIMETABLE_DAYS, WARD_ALL } from '@dgp/shared';
+import { wardCondition } from '../../utils/ward.js';
 import { TimetableEntry } from './timetable.model.js';
 import { AppError } from '../../utils/app-error.js';
 import { writeAudit } from '../audit/audit.service.js';
@@ -40,8 +41,24 @@ async function audit(officerId, action, entry, before) {
  * can say "not published yet" for one service while showing the other — instead of having to
  * infer absence from a missing key.
  */
-export async function publicTimetable() {
-  const rows = await TimetableEntry.find({ isActive: true, isPublished: true }).lean();
+export async function publicTimetable(viewerWard = null) {
+  const filter = { isActive: true, isPublished: true };
+
+  /*
+   * Which slots this reader may see.
+   *
+   * A signed-in citizen sees their own ward and the village-wide schedule, never the other
+   * five wards' rounds — a Ward 3 household reading Ward 1's collection time is worse than
+   * reading nothing. Anyone else (not signed in, or signed in with no ward yet recorded) sees
+   * only the village-wide schedule: there is no ward to guess from, and guessing one would
+   * publish a time to the wrong street.
+   *
+   * null is included for both, because entries published before wards existed were published
+   * to the whole village and still are.
+   */
+  filter.ward = viewerWard ? { $in: [viewerWard, WARD_ALL, null] } : { $in: [WARD_ALL, null] };
+
+  const rows = await TimetableEntry.find(filter).lean();
   const entries = rows.map(shape).sort(byOrderThenDay);
   return {
     Ghantagadi: entries.filter((e) => e.serviceType === 'Ghantagadi'),
@@ -57,6 +74,10 @@ export async function publicTimetable() {
 export async function adminList(query = {}) {
   const filter = { isActive: true };
   if (query.serviceType) filter.serviceType = query.serviceType;
+  // Stored on the entry, so no citizen lookup here — unlike tax and certificates, a schedule
+  // belongs to a ward directly.
+  const ward = wardCondition(query.ward);
+  if (ward !== null) filter.ward = ward;
   const rows = await TimetableEntry.find(filter).lean();
   return { data: rows.map(shape).sort(byOrderThenDay), total: rows.length };
 }
@@ -64,6 +85,7 @@ export async function adminList(query = {}) {
 export async function createEntry(officerId, body) {
   const entry = await TimetableEntry.create({
     serviceType: body.serviceType,
+    ward: body.ward || null,
     title: body.title,
     titleMr: body.titleMr || '',
     area: body.area || '',
@@ -83,6 +105,7 @@ export async function createEntry(officerId, body) {
 
 const PATCHABLE = [
   'serviceType',
+  'ward',
   'title',
   'titleMr',
   'area',

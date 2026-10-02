@@ -30,8 +30,6 @@
     "openMenu": "Open menu",
     "portalLabel": "Officer portal",
     "toggleLanguage": "Switch language",
-    "themeDark": "Switch to dark theme",
-    "themeLight": "Switch to light theme",
     "meetings": "Gram Sabha",
     "projects": "Works",
     "polls": "Polls",
@@ -185,7 +183,8 @@
     "prevPage": "Previous page",
     "nextPage": "Next page",
     "clear": "Clear",
-    "close": "Close"
+    "close": "Close",
+    "save": "Save"
   },
   "complaint": {
     "category": {
@@ -606,6 +605,22 @@
       "coupleIdentity": "Identity proof of bride and groom",
       "marriageProof": "Proof of marriage",
       "witnessIdentity": "Witness identity proof (optional)"
+    },
+    "add": {
+      "title": "Add certificate",
+      "submit": "Create and issue",
+      "citizenMobile": "Citizen mobile",
+      "lookup": "Find",
+      "badMobile": "Enter a valid 10-digit mobile",
+      "citizenNotFound": "No citizen found with that mobile",
+      "lookupFirst": "Find the citizen first",
+      "type": "Certificate type",
+      "documents": "Supporting documents",
+      "documentsNote": "Attach the documents you have checked. The system stores them for the record — it does not verify them.",
+      "attachedCount": "{{count}} of {{total}} document groups attached",
+      "missingDocs": "{{count}} required document group(s) still missing",
+      "created": "Certificate {{number}} issued",
+      "failed": "Could not create the certificate"
     }
   },
   "auth": {
@@ -1063,5 +1078,23 @@
     "saveFailed": "Could not save the entry",
     "deleteFailed": "Could not delete the entry",
     "confirmDelete": "Delete this timetable entry?"
+  },
+  "ward": {
+    "label": "Ward",
+    "all": "All Wards",
+    "unset": "Ward not set",
+    "filter": "Filter by ward",
+    "assign": "Assign ward",
+    "assigned": "Ward updated",
+    "assignFailed": "Could not update the ward",
+    "allWards": "All Wards (village-wide)",
+    "names": {
+      "Ward 1": "Ward 1",
+      "Ward 2": "Ward 2",
+      "Ward 3": "Ward 3",
+      "Ward 4": "Ward 4",
+      "Ward 5": "Ward 5",
+      "Ward 6": "Ward 6"
+    }
   }
 }

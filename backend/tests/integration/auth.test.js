@@ -16,6 +16,7 @@ const validCitizen = {
   password: 'Secret@123',
   village: 'Sakharale',
   address: 'House 12, Main Road',
+  ward: 'Ward 1',
 };
 
 beforeAll(async () => {
@@ -192,5 +193,86 @@ describe('POST /api/v1/admin/login', () => {
       .post('/api/v1/admin/login')
       .send({ email: 'officer@dgp.local', password: 'nope' });
     expect(res.status).toBe(401);
+  });
+});
+
+/**
+ * Ward is required at registration but optional in the schema, and those are not in conflict:
+ * accounts created before wards existed have none, and a required field would make every one
+ * of them fail to save the next time an officer touched it. Nothing is backfilled.
+ */
+describe('ward on registration', () => {
+  const base = {
+    fullName: 'Ward Tester',
+    password: 'Secret@123',
+    village: 'Sakharale',
+    address: 'Main Road',
+  };
+
+  it('refuses a registration with no ward', async () => {
+    const res = await request(app)
+      .post('/api/v1/auth/register')
+      .send({ ...base, mobile: '9876511101' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.fields.ward).toBeDefined();
+  });
+
+  it.each([
+    ['Ward 0', '01'],
+    ['Ward 7', '02'],
+    ['ward 1', '03'],
+    ['All Wards', '04'],
+    ['Mumbai', '05'],
+    ['', '06'],
+  ])('refuses the invalid ward %p', async (ward, suffix) => {
+    const res = await request(app)
+      .post('/api/v1/auth/register')
+      .send({ ...base, mobile: `98765112${suffix}`, ward });
+
+    expect(res.status).toBe(400);
+  });
+
+  it.each([
+    ['Ward 1', '01'],
+    ['Ward 2', '02'],
+    ['Ward 3', '03'],
+    ['Ward 4', '04'],
+    ['Ward 5', '05'],
+    ['Ward 6', '06'],
+  ])('accepts and stores %s', async (ward, suffix) => {
+    const mobile = `98765113${suffix}`;
+    const res = await request(app)
+      .post('/api/v1/auth/register')
+      .send({ ...base, mobile, ward });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.user.ward).toBe(ward);
+    // And it is on the row, not just the response.
+    expect((await User.findOne({ mobile })).ward).toBe(ward);
+  });
+
+  it('leaves an account created before wards existed valid and saveable', async () => {
+    // Written straight to the collection, the way an account arrived before the field existed.
+    const legacy = await User.create({
+      role: ROLES.CITIZEN,
+      fullName: 'Legacy Citizen',
+      mobile: '9876511999',
+      passwordHash: await hashPassword('Secret@123'),
+      village: 'Sakharale',
+      address: 'Old Road',
+    });
+
+    expect(legacy.ward).toBeNull();
+
+    // The point of leaving the schema optional: touching the row must not throw.
+    legacy.fullName = 'Legacy Citizen Renamed';
+    await expect(legacy.save()).resolves.toBeTruthy();
+
+    // And they can still sign in.
+    const res = await request(app)
+      .post('/api/v1/auth/login')
+      .send({ mobile: '9876511999', password: 'Secret@123' });
+    expect(res.status).toBe(200);
   });
 });

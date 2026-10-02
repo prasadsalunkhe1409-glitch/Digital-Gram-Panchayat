@@ -44,7 +44,6 @@ const TaxSummary = lazyNamed(() => import('@/features/tax/pages/TaxSummary'), 'T
 const Meetings = lazyNamed(() => import('@/features/governance/pages/Meetings'), 'Meetings');
 const Projects = lazyNamed(() => import('@/features/governance/pages/Projects'), 'Projects');
 const Polls = lazyNamed(() => import('@/features/governance/pages/Polls'), 'Polls');
-const Feedback = lazyNamed(() => import('@/features/governance/pages/Feedback'), 'Feedback');
 const Downloads = lazyNamed(() => import('@/features/governance/pages/Downloads'), 'Downloads');
 const ApplicationList = lazyNamed(
   () => import('@/features/dakhala/pages/ApplicationList'),
@@ -107,7 +106,11 @@ const router = createBrowserRouter([
           { path: 'meetings', element: page(<Meetings />) },
           { path: 'projects', element: page(<Projects />) },
           { path: 'polls', element: page(<Polls />) },
-          { path: 'feedback', element: page(<Feedback />) },
+          /*
+           * Feedback is withdrawn from the citizen product. The API, the stored
+           * feedback and the officer analytics all stay — this removes the route a
+           * citizen could reach, not the feature's data or its administrative half.
+           */
           { path: 'downloads', element: page(<Downloads />) },
           { path: 'dakhala', element: page(<ApplicationList />) },
           { path: 'dakhala/new', element: page(<ApplyCertificate />) },

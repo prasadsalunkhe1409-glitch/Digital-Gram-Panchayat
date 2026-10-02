@@ -257,15 +257,28 @@ export function CertificateReview() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
-                    <Button onClick={startApprove}>
+                  /*
+                   * Approve is the decision this screen exists for, so it is the only filled
+                   * button. Reject stays — it is a real outcome and the backend and the
+                   * historical Rejected records both depend on it — but as a quiet ghost
+                   * action, separated by a rule, so the two no longer read as equals.
+                   */
+                  <div className="flex flex-col gap-3">
+                    <Button size="lg" onClick={startApprove}>
                       <Check className="h-4 w-4" aria-hidden="true" />
                       {t('dakhala.review.approve')}
                     </Button>
-                    <Button variant="destructive" onClick={() => setRejectOpen(true)}>
-                      <X className="h-4 w-4" aria-hidden="true" />
-                      {t('dakhala.review.reject')}
-                    </Button>
+                    <div className="border-t border-border pt-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full text-destructive-strong hover:bg-destructive-subtle"
+                        onClick={() => setRejectOpen(true)}
+                      >
+                        <X className="h-4 w-4" aria-hidden="true" />
+                        {t('dakhala.review.reject')}
+                      </Button>
+                    </div>
                   </div>
                 )}
               </CardContent>

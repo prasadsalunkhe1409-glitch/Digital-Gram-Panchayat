@@ -309,40 +309,12 @@ export const CITIZEN_TOPICS = [
         },
       },
     ],
-    related: ['change-theme', 'settings-overview'],
+    related: ['settings-overview'],
     route: '/settings',
     keywords: {
       en: ['language', 'marathi', 'english', 'translate'],
       mr: ['भाषा', 'मराठी', 'इंग्रजी'],
     },
-  },
-  {
-    id: 'change-theme',
-    category: 'theme',
-    audience: 'both',
-    title: { en: 'Switch between light and dark', mr: 'फिकट व गडद रंगसंगती बदला' },
-    summary: {
-      en: 'Use dark mode to reduce eye strain at night.',
-      mr: 'रात्री डोळ्यांवरील ताण कमी करण्यासाठी गडद रंगसंगती वापरा.',
-    },
-    minutes: 1,
-    steps: [
-      {
-        text: {
-          en: 'Tap the sun / moon button in the header.',
-          mr: 'हेडरमधील सूर्य / चंद्र बटण दाबा.',
-        },
-      },
-      {
-        text: {
-          en: 'Or open Settings and choose Light or Dark.',
-          mr: 'किंवा सेटिंग्ज उघडून फिकट किंवा गडद निवडा.',
-        },
-      },
-    ],
-    related: ['change-language', 'settings-overview'],
-    route: '/settings',
-    keywords: { en: ['theme', 'dark', 'light', 'night mode'], mr: ['रंगसंगती', 'गडद', 'फिकट'] },
   },
 
   // ---------------------------------------------------------------- Complaints
@@ -1034,7 +1006,7 @@ export const CITIZEN_TOPICS = [
         },
       },
     ],
-    related: ['view-notices', 'directory'],
+    related: ['view-notices', 'member-contacts'],
     route: '/',
     keywords: {
       en: ['event', 'gram sabha', 'meeting', 'camp', 'festival'],
@@ -1044,40 +1016,49 @@ export const CITIZEN_TOPICS = [
 
   // ---------------------------------------------------------------- Directory / emergency
   {
-    id: 'directory',
+    id: 'member-contacts',
     category: 'directory',
     audience: 'citizen',
-    title: { en: 'Find a Gram Panchayat official', mr: 'ग्रामपंचायत पदाधिकारी शोधा' },
-    summary: {
-      en: 'Sarpanch, Gram Sevak, Talathi, ward members and their contact details.',
-      mr: 'सरपंच, ग्रामसेवक, तलाठी, प्रभाग सदस्य व त्यांचे संपर्क तपशील.',
+    title: {
+      en: 'Phone a Gram Panchayat member',
+      mr: 'ग्रामपंचायत सदस्याला फोन करा',
     },
-    minutes: 2,
+    summary: {
+      en: 'Names and mobile numbers of the members, on the home page — no login needed.',
+      mr: 'सदस्यांची नावे व मोबाइल क्रमांक मुख्य पानावर — लॉगिन न करता.',
+    },
+    minutes: 1,
     steps: [
       {
         text: {
-          en: 'Open the Directory from Quick Services or the home page footer.',
-          mr: 'जलद सेवा किंवा मुख्यपृष्ठाच्या तळातून "निर्देशिका" उघडा.',
+          en: 'Open the village home page. You do not have to log in.',
+          mr: 'गावाचे मुख्य पान उघडा. लॉगिन करण्याची गरज नाही.',
         },
       },
       {
         text: {
-          en: 'Search by name, designation or ward, or use the category chips.',
-          mr: 'नाव, पद किंवा प्रभागाने शोधा, किंवा श्रेणी बटणे वापरा.',
+          en: 'Scroll to "Gram Panchayat Members".',
+          mr: '"ग्रामपंचायत सदस्य" पर्यंत खाली जा.',
         },
       },
       {
         text: {
-          en: 'Tap Call or Email to contact them directly, or copy the number.',
-          mr: 'थेट संपर्कासाठी "कॉल करा" किंवा "ईमेल" दाबा, किंवा क्रमांक कॉपी करा.',
+          en: 'The mobile number is shown on each card. Tap "Call" to dial it.',
+          mr: 'प्रत्येक कार्डावर मोबाइल क्रमांक दिसतो. कॉल करण्यासाठी "कॉल" दाबा.',
         },
       },
     ],
-    related: ['contact-office', 'emergency'],
-    route: '/directory',
+    notes: [
+      {
+        en: 'Only the numbers the Gram Panchayat has published are shown. A member with no published number has no Call button.',
+        mr: 'ग्रामपंचायतीने प्रसिद्ध केलेले क्रमांकच दाखवले जातात. क्रमांक नसलेल्या सदस्याचे "कॉल" बटण दिसत नाही.',
+      },
+    ],
+    related: ['contact-office'],
+    route: '/welcome',
     keywords: {
-      en: ['directory', 'sarpanch', 'gram sevak', 'talathi', 'contact', 'official', 'ward member'],
-      mr: ['निर्देशिका', 'सरपंच', 'ग्रामसेवक', 'तलाठी', 'संपर्क'],
+      en: ['member', 'members', 'sarpanch', 'official', 'phone', 'mobile', 'call', 'contact'],
+      mr: ['सदस्य', 'सरपंच', 'पदाधिकारी', 'फोन', 'मोबाइल', 'संपर्क'],
     },
   },
   {
@@ -1104,48 +1085,142 @@ export const CITIZEN_TOPICS = [
         },
       },
     ],
-    related: ['directory', 'emergency'],
+    related: ['member-contacts'],
     route: '/directory',
     keywords: {
       en: ['office', 'address', 'timing', 'phone', 'visit'],
       mr: ['कार्यालय', 'पत्ता', 'वेळ', 'दूरध्वनी'],
     },
   },
+
   {
-    id: 'emergency',
-    category: 'emergency',
+    id: 'select-ward',
+    category: 'registration',
     audience: 'citizen',
-    title: { en: 'Emergency contact numbers', mr: 'आपत्कालीन संपर्क क्रमांक' },
+    title: { en: 'Choosing your ward', mr: 'तुमचा प्रभाग निवडणे' },
     summary: {
-      en: 'Police, fire, ambulance and other helplines — one tap to call.',
-      mr: 'पोलीस, अग्निशमन, रुग्णवाहिका व इतर मदत क्रमांक — एका स्पर्शात कॉल.',
+      en: 'Your ward decides which collection and water timings you are shown.',
+      mr: 'तुमचा प्रभाग ठरवतो की तुम्हाला कोणते कचरा व पाणी वेळापत्रक दिसेल.',
     },
-    minutes: 1,
+    minutes: 2,
     steps: [
       {
         text: {
-          en: 'Open "Emergency" from Quick Services on your dashboard.',
-          mr: 'डॅशबोर्डवरील जलद सेवांमधून "आपत्कालीन" उघडा.',
+          en: 'On the registration form, open the "Ward" list.',
+          mr: 'नोंदणी अर्जावर "प्रभाग" यादी उघडा.',
         },
       },
       {
         text: {
-          en: 'Tap any number to call it directly.',
-          mr: 'थेट कॉल करण्यासाठी कोणताही क्रमांक दाबा.',
+          en: 'Choose the ward you live in, from Ward 1 to Ward 6.',
+          mr: 'तुम्ही राहता तो प्रभाग निवडा — प्रभाग १ ते प्रभाग ६.',
+        },
+      },
+      {
+        text: {
+          en: 'You cannot register without choosing a ward.',
+          mr: 'प्रभाग निवडल्याशिवाय नोंदणी पूर्ण होत नाही.',
         },
       },
     ],
     notes: [
       {
-        en: 'National helplines: Police 100, Fire 101, Ambulance 108, Emergency 112, Electricity 1912.',
-        mr: 'राष्ट्रीय मदत क्रमांक: पोलीस १००, अग्निशमन १०१, रुग्णवाहिका १०८, आपत्कालीन ११२, वीज १९१२.',
+        en: 'If you are not sure which ward you are in, ask at the Gram Panchayat office. An officer can correct your ward later.',
+        mr: 'तुमचा प्रभाग माहीत नसल्यास ग्रामपंचायत कार्यालयात विचारा. अधिकारी नंतर तो बदलू शकतात.',
+      },
+      {
+        en: 'Accounts created before wards were introduced have no ward. An officer can add it at the office.',
+        mr: 'प्रभाग सुरू होण्यापूर्वी तयार झालेल्या खात्यांना प्रभाग नसतो. अधिकारी तो कार्यालयात जोडू शकतात.',
       },
     ],
-    related: ['directory', 'contact-office'],
+    related: ['register', 'timetable-ward'],
+    route: '/register',
+    keywords: {
+      en: ['ward', 'ward 1', 'ward 2', 'ward 3', 'ward 4', 'ward 5', 'ward 6', 'register'],
+      mr: ['प्रभाग', 'वॉर्ड', 'नोंदणी'],
+    },
+  },
+
+  {
+    id: 'timetable',
+    category: 'notices',
+    audience: 'citizen',
+    title: { en: 'Ghantagadi and water supply timings', mr: 'घंटागाडी व पाणीपुरवठा वेळा' },
+    summary: {
+      en: 'When the waste collection vehicle comes and when the water runs.',
+      mr: 'कचरा गाडी कधी येते आणि पाणी कधी येते.',
+    },
+    minutes: 1,
+    steps: [
+      {
+        text: {
+          en: 'Open the home page and scroll to "Timetable".',
+          mr: 'मुख्य पान उघडा आणि "वेळापत्रक" पर्यंत खाली जा.',
+        },
+      },
+      {
+        text: {
+          en: 'Ghantagadi and Water supply are shown side by side, each with its day and time.',
+          mr: 'घंटागाडी व पाणीपुरवठा शेजारी दाखवले जातात, प्रत्येकाचा दिवस व वेळ.',
+        },
+      },
+    ],
+    notes: [
+      {
+        en: 'If the Gram Panchayat has not published a schedule yet, the card says so. No timings are guessed.',
+        mr: 'ग्रामपंचायतीने वेळापत्रक अद्याप प्रसिद्ध केले नसेल तर कार्डावर तसे लिहिलेले असते. वेळा अंदाजाने दाखवल्या जात नाहीत.',
+      },
+    ],
+    related: ['timetable-ward', 'view-notices'],
     route: '/',
     keywords: {
-      en: ['emergency', 'police', 'ambulance', 'fire', 'helpline', '108', '112'],
-      mr: ['आपत्कालीन', 'पोलीस', 'रुग्णवाहिका', 'अग्निशमन'],
+      en: ['timetable', 'ghantagadi', 'water', 'supply', 'collection', 'garbage', 'schedule'],
+      mr: ['वेळापत्रक', 'घंटागाडी', 'पाणी', 'पाणीपुरवठा', 'कचरा'],
+    },
+  },
+
+  {
+    id: 'timetable-ward',
+    category: 'notices',
+    audience: 'citizen',
+    title: {
+      en: 'Why you see only your ward timings',
+      mr: 'फक्त तुमच्याच प्रभागाच्या वेळा का दिसतात',
+    },
+    summary: {
+      en: 'The timetable shows your ward and any village-wide schedule, nothing else.',
+      mr: 'वेळापत्रकात तुमचा प्रभाग व संपूर्ण गावासाठीचे वेळापत्रक दिसते, इतर काही नाही.',
+    },
+    minutes: 2,
+    steps: [
+      {
+        text: {
+          en: 'Log in. The timetable then uses the ward on your account.',
+          mr: 'लॉगिन करा. त्यानंतर वेळापत्रक तुमच्या खात्यावरील प्रभाग वापरते.',
+        },
+      },
+      {
+        text: {
+          en: 'Each row shows which ward it applies to, or "All / general" for the whole village.',
+          mr: 'प्रत्येक ओळीवर तो कोणत्या प्रभागासाठी आहे ते दिसते, किंवा संपूर्ण गावासाठी "सर्व / सर्वसाधारण".',
+        },
+      },
+    ],
+    notes: [
+      {
+        en: 'Other wards\u2019 timings are not shown, so you never act on a time meant for a different street.',
+        mr: 'इतर प्रभागांच्या वेळा दाखवल्या जात नाहीत, त्यामुळे दुसऱ्या भागाची वेळ चुकून वापरली जात नाही.',
+      },
+      {
+        en: 'Without logging in, or if your account has no ward yet, only the village-wide schedule is shown.',
+        mr: 'लॉगिन न करता, किंवा खात्याला प्रभाग नसल्यास, फक्त संपूर्ण गावाचे वेळापत्रक दिसते.',
+      },
+    ],
+    related: ['timetable', 'select-ward'],
+    route: '/',
+    keywords: {
+      en: ['ward', 'timetable', 'my ward', 'ghantagadi', 'water'],
+      mr: ['प्रभाग', 'वेळापत्रक', 'घंटागाडी', 'पाणी'],
     },
   },
 
@@ -1247,7 +1322,7 @@ export const CITIZEN_TOPICS = [
         },
       },
     ],
-    related: ['change-language', 'change-theme', 'notifications'],
+    related: ['change-language', 'notifications'],
     route: '/settings',
     keywords: { en: ['settings', 'preferences', 'options'], mr: ['सेटिंग्ज', 'पसंती'] },
   },

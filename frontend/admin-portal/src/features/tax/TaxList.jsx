@@ -8,6 +8,7 @@ import { Select } from '@/components/ui/input';
 import { SkeletonRows } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterBar, SearchInput } from '@/components/FilterBar';
+import { WardFilter } from '@/components/WardFilter';
 import { Pagination } from '@/components/Pagination';
 import {
   TableShell,
@@ -37,14 +38,21 @@ export function TaxList() {
   const [q, setQ] = useState('');
   const [taxType, setTaxType] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('');
+  const [ward, setWard] = useState('');
   const [page, setPage] = useState(1);
 
+  /*
+   * Every filter goes to the API. `q` matches the record's own identifiers or the citizen's
+   * name, and `ward` is resolved through the citizen — neither is something the browser can
+   * do, because the list is server-paginated and the name and ward live on another document.
+   */
   const params = {
     page,
     limit: LIMIT,
     ...(q ? { q } : {}),
     ...(taxType ? { taxType } : {}),
     ...(paymentStatus ? { paymentStatus } : {}),
+    ...(ward ? { ward } : {}),
   };
   const { data, isLoading, isError } = useTaxRecords(params);
   const rows = data?.data ?? [];
@@ -70,6 +78,7 @@ export function TaxList() {
 
       <FilterBar>
         <SearchInput value={q} onChange={onFilter(setQ)} placeholder={t('tax.dash.search')} />
+        <WardFilter value={ward} onChange={onFilter(setWard)} variant="people" />
         <Select
           value={taxType}
           onChange={(e) => onFilter(setTaxType)(e.target.value)}

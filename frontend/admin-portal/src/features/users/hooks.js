@@ -22,6 +22,17 @@ export function useUser(id) {
   });
 }
 
+export function useSetUserWard() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ward }) => userService.setWard(id, ward),
+    onSuccess: (updated) => {
+      if (updated?.id) qc.setQueryData(userKeys.detail(updated.id), updated);
+      qc.invalidateQueries({ queryKey: ['admin-users', 'list'] });
+    },
+  });
+}
+
 export function useSetUserStatus(id) {
   const qc = useQueryClient();
   return useMutation({

@@ -31,6 +31,8 @@ async function register(page, mobile) {
   await page.getByLabel(/password/i).fill(PASSWORD);
   await page.getByLabel(/village/i).fill('Sakharale');
   await page.getByLabel(/address/i).fill('Main Road');
+  // Ward is required at registration — the form cannot be submitted without one.
+  await page.getByLabel(/^ward$/i).selectOption('Ward 3');
   await page.getByRole('button', { name: /register/i }).click();
 
   /*

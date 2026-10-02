@@ -33,3 +33,31 @@ export async function authenticate(req, _res, next) {
     next(err);
   }
 }
+
+/**
+ * Identify the caller if they happen to be signed in, and carry on if they are not.
+ *
+ * For routes that are public by design but can personalise themselves — the timetable is
+ * public so a villager can check the Ghantagadi without an account, yet a signed-in citizen
+ * should see their own ward's rounds rather than all six.
+ *
+ * Deliberately silent: a missing, malformed, expired or deactivated token leaves `req.user`
+ * undefined and the request proceeds as anonymous. It never rejects, because rejecting would
+ * turn a public page into a login wall the moment a token went stale in someone's browser.
+ * Anything that must not be public still goes behind `authenticate`.
+ */
+export async function attachUserIfPresent(req, _res, next) {
+  try {
+    const header = req.headers.authorization || '';
+    if (header.startsWith('Bearer ')) {
+      const payload = verifyToken(header.slice(7).trim());
+      const user = await User.findById(payload.sub);
+      if (user && user.isActive) {
+        req.user = { id: user.id, role: user.role, ward: user.ward ?? null };
+      }
+    }
+  } catch {
+    // Anonymous is a valid outcome here, not an error.
+  }
+  next();
+}

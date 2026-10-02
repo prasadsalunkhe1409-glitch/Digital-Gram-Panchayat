@@ -9,7 +9,6 @@ import {
   Landmark,
   Receipt,
   Megaphone,
-  ShieldAlert,
   CalendarDays,
   Building2,
   Award,
@@ -19,6 +18,7 @@ import {
 } from 'lucide-react';
 import { formatDate } from '@dgp/shared';
 import logo from '@dgp/shared/assets/logo.svg';
+import { sortMembers } from '@/features/village/members';
 import { HERO, eventArtFor } from '@/components/Artwork';
 import { SafeImage } from '@/components/SafeImage';
 import { MapView } from '@/components/MapView';
@@ -36,15 +36,14 @@ const DEFAULT_SERVICES = [
   { key: 'schemes', icon: Landmark },
   { key: 'tax', icon: Receipt },
   { key: 'notices', icon: Megaphone },
-  { key: 'emergency', icon: ShieldAlert },
 ];
 
 // In-page anchor links for the footer.
 const QUICK_LINKS = [
   { href: '#services', key: 'public.services' },
+  { href: '#members', key: 'public.members' },
   { href: '#notices', key: 'public.latestNotices' },
   { href: '#schemes', key: 'public.latestSchemes' },
-  { href: '#emergency', key: 'public.emergency' },
 ];
 
 // Official Government of India / Maharashtra portals (public, static — not sourced data).
@@ -92,6 +91,7 @@ export function PublicHome() {
   const { data: schemesData } = useSchemes();
 
   const g = profile?.general ?? {};
+  const members = sortMembers(profile?.members ?? []);
   const villageName = g.villageName || t('appName');
   const stats = Object.entries(profile?.statistics ?? {}).filter(([, v]) => v !== '' && v != null);
   const services = profile?.services?.length ? profile.services : DEFAULT_SERVICES;
@@ -100,7 +100,6 @@ export function PublicHome() {
   const events = (eventsData?.data ?? []).slice(0, 4);
   const gallery = (profile?.gallery ?? []).slice(0, 6);
   const awards = profile?.awards ?? [];
-  const contacts = profile?.emergencyContacts ?? [];
   const hasMap = typeof g.latitude === 'number' && typeof g.longitude === 'number';
 
   const lead = profile?.leadership ?? {};
@@ -318,6 +317,59 @@ export function PublicHome() {
         </section>
       ) : null}
 
+      {/*
+       * Who to ring, before anyone has to sign in.
+       *
+       * This lived behind the login until now, which put the Panchayat's own phone numbers
+       * out of reach of exactly the person most likely to need them — someone who has not
+       * registered yet. It reads from the same village profile the directory does; nothing
+       * is hard-coded and no field is shown that the directory does not already publish.
+       */}
+      {members.length ? (
+        <Section id="members" title={t('public.members')}>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {members.map((m) => (
+              <article
+                key={m.id ?? `${m.name}-${m.designation}`}
+                className="flex min-w-0 flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow-xs"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-body font-semibold text-foreground">
+                    {m.name || '—'}
+                  </p>
+                  {m.designation ? (
+                    <p className="truncate text-caption text-muted-foreground">{m.designation}</p>
+                  ) : null}
+                  {m.ward ? (
+                    <p className="truncate text-caption text-muted-foreground">
+                      {t('directory.ward')}: {m.ward}
+                    </p>
+                  ) : null}
+                </div>
+
+                {m.mobile ? (
+                  <div className="mt-auto flex items-center justify-between gap-2 pt-1">
+                    {/* The digits, not only a Call button: a number you can read is one you
+                        can write down, dictate, or dial from a landline. */}
+                    <span className="truncate text-body tabular-nums text-foreground">
+                      {m.mobile}
+                    </span>
+                    <a
+                      href={`tel:${m.mobile}`}
+                      aria-label={`${t('directory.call')} ${m.name || ''} ${m.mobile}`}
+                      className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 text-body font-medium text-primary-foreground transition-colors duration-150 hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <Phone className="h-4 w-4" aria-hidden="true" />
+                      {t('directory.call')}
+                    </a>
+                  </div>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </Section>
+      ) : null}
+
       {/* Upcoming events */}
       {events.length ? (
         <Section id="events" title={t('public.events')}>
@@ -411,33 +463,6 @@ export function PublicHome() {
         </Section>
       ) : null}
 
-      {/* Emergency contacts */}
-      {contacts.length ? (
-        <Section id="emergency" title={t('public.emergency')}>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {contacts.map((c, i) => (
-              <a
-                key={`${c.label}-${i}`}
-                href={`tel:${c.phone}`}
-                className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 shadow-xs transition-colors duration-150 hover:bg-accent"
-              >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive-subtle text-destructive-strong">
-                  <Phone className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block truncate text-body font-medium text-foreground">
-                    {c.label}
-                  </span>
-                  <span className="block truncate text-caption text-muted-foreground">
-                    {c.phone}
-                  </span>
-                </span>
-              </a>
-            ))}
-          </div>
-        </Section>
-      ) : null}
-
       {/* Location */}
       {hasMap ? (
         <Section id="location" title={t('public.location')}>
@@ -481,14 +506,6 @@ export function PublicHome() {
                   className="text-muted-foreground transition-colors duration-150 hover:text-primary"
                 >
                   {t('help.title')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/directory"
-                  className="text-muted-foreground transition-colors duration-150 hover:text-primary"
-                >
-                  {t('directory.heading')}
                 </Link>
               </li>
               <li>

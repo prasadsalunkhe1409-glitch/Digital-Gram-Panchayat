@@ -1,5 +1,6 @@
 import { body, param, query } from 'express-validator';
 import { TAX_TYPES, PAYMENT_STATUSES } from '@dgp/shared';
+import { WARD_FILTER_VALUES } from '../../utils/ward.js';
 
 export const createTaxValidation = [
   body('citizenId').isMongoId().withMessage('Valid citizen is required'),
@@ -45,6 +46,10 @@ export const listQueryValidation = [
   query('financialYear')
     .optional()
     .matches(/^\d{4}-\d{4}$/),
+  // `q` was read by the service but never declared here. Bounded, so a pathological regex
+  // source cannot be pushed through the search path.
+  query('q').optional({ values: 'falsy' }).trim().isLength({ max: 80 }),
+  query('ward').optional().isIn(WARD_FILTER_VALUES),
 ];
 
 export const mineQueryValidation = [

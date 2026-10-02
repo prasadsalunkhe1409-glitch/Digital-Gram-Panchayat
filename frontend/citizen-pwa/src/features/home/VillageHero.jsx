@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, CloudSun, Languages, MapPin, Moon, Sun } from 'lucide-react';
+import { CalendarDays, CloudSun, Languages, MapPin } from 'lucide-react';
 import { formatDate } from '@dgp/shared';
 import { SafeImage } from '@/components/SafeImage';
 import { HERO } from '@/components/Artwork';
-import { useTheme, useLanguage } from '@/store';
+import { useLanguage } from '@/store';
 
 /** Morning / afternoon / evening, from the device clock. */
 function greetingKey(hour) {
@@ -23,7 +23,6 @@ function greetingKey(hour) {
 export function VillageHero({ profile, firstName }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'mr' ? 'mr' : 'en';
-  const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
 
   const g = profile?.general ?? {};
@@ -80,18 +79,6 @@ export function VillageHero({ profile, firstName }) {
             >
               <Languages className="h-5 w-5" aria-hidden="true" />
               <span className="sr-only">{language === 'mr' ? 'EN' : 'मर'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-label={t(theme === 'dark' ? 'nav.themeLight' : 'nav.themeDark')}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 backdrop-blur transition-colors duration-150 hover:bg-white/25"
-            >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5" aria-hidden="true" />
-              ) : (
-                <Moon className="h-5 w-5" aria-hidden="true" />
-              )}
             </button>
           </div>
         </div>

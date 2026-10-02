@@ -1,9 +1,9 @@
 import { useId, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Languages, Moon, Sun, Bell, HelpCircle, RotateCcw, ChevronDown } from 'lucide-react';
+import { Languages, Bell, HelpCircle, RotateCcw, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTheme, useLanguage } from '@/store';
+import { useLanguage } from '@/store';
 import { NotificationPrefs } from '@/features/settings/NotificationPrefs';
 import { replayOnboarding } from '@/features/onboarding/useOnboarding';
 
@@ -60,7 +60,6 @@ function FaqItem({ id, question, answer, isOpen, onToggle }) {
 
 export function Settings() {
   const { t } = useTranslation();
-  const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
   const [openFaq, setOpenFaq] = useState(null);
   const faqId = useId();
@@ -82,25 +81,6 @@ export function Settings() {
               onClick={() => setLanguage(l.code)}
             >
               {l.label}
-            </Button>
-          ))}
-        </div>
-      </Section>
-
-      <Section icon={theme === 'dark' ? Moon : Sun} title={t('settings.theme')}>
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { value: 'light', label: t('settings.light'), Icon: Sun },
-            { value: 'dark', label: t('settings.dark'), Icon: Moon },
-          ].map((opt) => (
-            <Button
-              key={opt.value}
-              variant={theme === opt.value ? 'default' : 'outline'}
-              aria-pressed={theme === opt.value}
-              onClick={() => setTheme(opt.value)}
-            >
-              <opt.Icon className="h-4 w-4" aria-hidden="true" />
-              {opt.label}
             </Button>
           ))}
         </div>

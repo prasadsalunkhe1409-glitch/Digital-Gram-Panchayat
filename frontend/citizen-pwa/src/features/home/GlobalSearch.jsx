@@ -46,13 +46,9 @@ const SERVICES = [
   ['nav.tax', '/tax'],
   ['nav.schemes', '/schemes'],
   ['nav.notices', '/notices'],
-  ['nav.directory', '/directory'],
-  ['nav.verify', '/verify'],
-  ['nav.notifications', '/notifications'],
   ['nav.meetings', '/meetings'],
   ['nav.projects', '/projects'],
   ['nav.polls', '/polls'],
-  ['nav.downloads', '/downloads'],
 ];
 
 const MAX_PER_GROUP = 4;

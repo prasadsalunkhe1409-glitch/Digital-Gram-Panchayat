@@ -108,6 +108,34 @@ export const CERT_TYPES_ALL = [...CERT_TYPES, ...CERT_TYPES_LEGACY];
  * Two today. The list is here rather than inline in the model so the officer form, the citizen
  * screen and the API validator all offer exactly the same set.
  */
+/**
+ * The village's six wards.
+ *
+ * One list, read by the registration form, the user schema, every officer filter and the
+ * timetable. Ward is an administrative boundary the Panchayat already works in, so it is a
+ * fixed enum rather than free text — a typo in a ward name silently removes a citizen from
+ * the filter their officer uses to find them.
+ */
+export const WARDS = ['Ward 1', 'Ward 2', 'Ward 3', 'Ward 4', 'Ward 5', 'Ward 6'];
+
+/**
+ * A timetable slot that applies to the whole village rather than one ward.
+ *
+ * Kept out of WARDS deliberately: it is a valid value for a schedule but never a valid value
+ * for a citizen, and folding it into one list would let somebody register as "All Wards".
+ */
+export const WARD_ALL = 'All Wards';
+
+/** Every ward a timetable entry may carry. */
+export const TIMETABLE_WARDS = [WARD_ALL, ...WARDS];
+
+/**
+ * The officer filter value for records whose citizen never had a ward recorded — the accounts
+ * and rows that predate the ward field. It is a filter token, never a stored value: nothing is
+ * backfilled, so "not set" means exactly that.
+ */
+export const WARD_UNSET = 'unset';
+
 export const TIMETABLE_SERVICES = ['Ghantagadi', 'WaterSupply'];
 
 /**

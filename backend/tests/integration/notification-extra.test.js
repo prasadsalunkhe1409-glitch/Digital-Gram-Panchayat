@@ -49,6 +49,7 @@ async function citizen(mobile = '9876500003') {
     password: 'Secret@123',
     village: 'Sakharale',
     address: 'Road',
+    ward: 'Ward 1',
   });
   return res.body.data.token; // registration fires a welcome notification
 }

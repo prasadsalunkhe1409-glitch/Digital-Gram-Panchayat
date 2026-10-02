@@ -9,6 +9,7 @@ import { SkeletonRows } from '@/components/Skeleton';
 import { QueryError } from '@/components/QueryError';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterBar, SearchInput } from '@/components/FilterBar';
+import { WardFilter } from '@/components/WardFilter';
 import { Pagination } from '@/components/Pagination';
 import {
   TableShell,
@@ -33,6 +34,7 @@ export function ComplaintsList() {
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('');
   const [category, setCategory] = useState('');
+  const [ward, setWard] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortDir, setSortDir] = useState('desc');
   const [page, setPage] = useState(1);
@@ -45,6 +47,7 @@ export function ComplaintsList() {
     ...(q ? { q } : {}),
     ...(status ? { status } : {}),
     ...(category ? { category } : {}),
+    ...(ward ? { ward } : {}),
   };
   const { data, isLoading, isError, refetch, isFetching } = useComplaints(params);
 
@@ -75,6 +78,7 @@ export function ComplaintsList() {
     setQ('');
     setStatus('');
     setCategory('');
+    setWard('');
     setPage(1);
   };
 
@@ -114,6 +118,7 @@ export function ComplaintsList() {
             </option>
           ))}
         </Select>
+        <WardFilter value={ward} onChange={resetPageAnd(setWard)} variant="people" />
       </FilterBar>
 
       <TableShell className="max-h-[calc(100dvh-16rem)] overflow-y-auto">

@@ -16,8 +16,6 @@
     "verify": "Verify",
     "notifications": "Alerts",
     "toggleLanguage": "Switch language",
-    "themeDark": "Switch to dark theme",
-    "themeLight": "Switch to light theme",
     "meetings": "Gram Sabha",
     "projects": "Works",
     "polls": "Polls",
@@ -71,6 +69,17 @@
       "latestNotice": "Latest announcement",
       "allClear": "Nothing needs your attention",
       "allClearHint": "No open complaints, applications or dues."
+    },
+    "svc": {
+      "open": "Open",
+      "complaints": "Report a problem with water, roads or sanitation",
+      "dakhala": "Apply for a certificate and track it",
+      "tax": "See your dues, payments and bills",
+      "schemes": "Government schemes you can apply for",
+      "notices": "Official announcements from the Panchayat",
+      "meetings": "Gram Sabha dates, agendas and minutes",
+      "projects": "Development works and their progress",
+      "polls": "Have your say on village decisions"
     }
   },
   "notFound": {
@@ -82,7 +91,8 @@
     "loading": "Loading…",
     "online": "Online",
     "offline": "Offline",
-    "close": "Close"
+    "close": "Close",
+    "clear": "Clear"
   },
   "error": {
     "boundaryTitle": "Something went wrong",
@@ -111,9 +121,6 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
-    "theme": "Appearance",
-    "light": "Light",
-    "dark": "Dark",
     "notifications": "Notifications",
     "help": "Help & FAQ",
     "helpBody": "Answers to common questions about using the app.",
@@ -239,7 +246,11 @@
     "wrongTabVillager": "This account belongs to the Villager Portal.",
     "preferences": "Preferences",
     "statCertificatesIssued": "Certificates received",
-    "statPaid": "Tax paid"
+    "statPaid": "Tax paid",
+    "ward": "Ward",
+    "wardPlaceholder": "Select your ward",
+    "wardRequired": "Choose your ward",
+    "wardNotSet": "Ward not set"
   },
   "complaint": {
     "category": {
@@ -547,7 +558,6 @@
     "events": "Upcoming events",
     "gallery": "Village gallery",
     "achievements": "Achievements",
-    "emergency": "Emergency contacts",
     "location": "Location",
     "quickLinks": "Quick links",
     "govLinks": "Government links",
@@ -558,7 +568,8 @@
       "district": "District",
       "state": "State",
       "pinCode": "PIN code"
-    }
+    },
+    "members": "Gram Panchayat Members"
   },
   "verify": {
     "title": "Certificate verification",
@@ -870,6 +881,16 @@
       "Friday": "Friday",
       "Saturday": "Saturday",
       "Sunday": "Sunday"
+    },
+    "ward": {
+      "Ward 1": "Ward 1",
+      "Ward 2": "Ward 2",
+      "Ward 3": "Ward 3",
+      "Ward 4": "Ward 4",
+      "Ward 5": "Ward 5",
+      "Ward 6": "Ward 6",
+      "All Wards": "All wards",
+      "general": "All / general"
     }
   }
 }

@@ -1,5 +1,6 @@
 import { ROLES } from '@dgp/shared';
 import { parsePagination } from '../../utils/pagination.js';
+import { citizenIdsFor } from '../../utils/ward.js';
 import { TaxRecord } from './tax.model.js';
 import { getNextSequence } from '../complaints/counter.model.js';
 import { User } from '../auth/user.model.js';
@@ -252,8 +253,45 @@ async function paginate(filter, query) {
   return { data: items.map((r) => r.toJSON()), total, page, limit };
 }
 
+/**
+ * Officer tax list, with search and ward filtering.
+ *
+ * A tax record references a citizen; it does not copy their name or ward. Searching by either
+ * therefore resolves citizens first and constrains the record query by the ids that come back.
+ * Two `distinct` calls at most, regardless of how many records match — not one lookup per row.
+ *
+ * Ward and search are separate conditions on purpose. Ward narrows the whole result; `q` is a
+ * disjunction over the record's own identifiers *or* the citizen's name. Folding them into one
+ * `$or` would make a ward filter widen the result instead of narrowing it.
+ */
 export async function adminList(query) {
-  return paginate(buildFilter(query), query);
+  const filter = buildFilter(query);
+  const and = [];
+
+  if (query.ward) {
+    const wardIds = await citizenIdsFor({ ward: query.ward });
+    // No citizen in that ward means no record in that ward. Returning early keeps the officer
+    // from paging through every record because the filter silently did nothing.
+    if (!wardIds || wardIds.length === 0) {
+      const { page, limit } = parsePagination(query);
+      return { data: [], total: 0, page, limit };
+    }
+    and.push({ citizenId: { $in: wardIds } });
+  }
+
+  if (query.q) {
+    const rx = new RegExp(escapeRegex(query.q), 'i');
+    const nameIds = (await citizenIdsFor({ name: query.q })) ?? [];
+    // buildFilter already put the identifier arms in `$or`; replace it with the full
+    // disjunction so a name match counts too, and so ward can sit beside it in `$and`.
+    delete filter.$or;
+    and.push({
+      $or: [{ taxRecordId: rx }, { propertyNumber: rx }, { citizenId: { $in: nameIds } }],
+    });
+  }
+
+  if (and.length) filter.$and = and;
+  return paginate(filter, query);
 }
 
 /** @param {string} id */

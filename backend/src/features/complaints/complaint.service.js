@@ -1,5 +1,6 @@
 import { ROLES } from '@dgp/shared';
 import { parsePagination } from '../../utils/pagination.js';
+import { wardCondition } from '../../utils/ward.js';
 import { Complaint } from './complaint.model.js';
 import { getNextSequence } from './counter.model.js';
 import { User } from '../auth/user.model.js';
@@ -102,7 +103,10 @@ export async function adminList(query) {
   const filter = {};
   if (query.status) filter.status = query.status;
   if (query.category) filter.category = query.category;
-  if (query.ward) filter.ward = query.ward;
+  // wardCondition, so 'unset' finds the complaints filed before the ward field carried a
+  // validated value — they hold null or an empty string and both must match.
+  const wardFilter = wardCondition(query.ward);
+  if (wardFilter !== null) filter.ward = wardFilter;
   if (query.priority) filter.priority = query.priority;
   if (query.from || query.to) {
     filter.createdAt = {};

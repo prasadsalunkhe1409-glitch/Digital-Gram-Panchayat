@@ -56,13 +56,15 @@ describe('Header breadcrumb', () => {
     expect(onOpenNav).toHaveBeenCalledTimes(1);
   });
 
-  it('gives the language and theme toggles translated names', () => {
+  it('gives the language toggle a translated name', () => {
     renderAt(<Header onOpenNav={() => {}} />, '/');
-    // These were hardcoded English strings before, invisible to the Marathi catalogue.
+    // This was a hardcoded English string before, invisible to the Marathi catalogue.
     expect(screen.getByRole('button', { name: 'Switch language' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Switch to (dark|light) theme/ }),
-    ).toBeInTheDocument();
+  });
+
+  it('offers no theme toggle — the portal is light only', () => {
+    renderAt(<Header onOpenNav={() => {}} />, '/');
+    expect(screen.queryByRole('button', { name: /theme|dark|light/i })).toBeNull();
   });
 });
 

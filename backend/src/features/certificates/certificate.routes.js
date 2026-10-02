@@ -11,6 +11,7 @@ import {
   idParamValidation,
   rejectValidation,
   listQueryValidation,
+  officerCreateValidation,
 } from './certificate.validation.js';
 
 /**
@@ -44,6 +45,14 @@ export const adminDakhalaRouter = Router();
 adminDakhalaRouter.use(authenticate, authorize(ROLES.OFFICER));
 
 adminDakhalaRouter.get('/', listQueryValidation, validate, controller.adminList);
+// Same upload middleware as the citizen route, so the magic-byte check still runs.
+adminDakhalaRouter.post(
+  '/',
+  uploadCertificateDocuments,
+  officerCreateValidation,
+  validate,
+  controller.officerCreate,
+);
 adminDakhalaRouter.get('/:id', idParamValidation, validate, controller.adminGetOne);
 adminDakhalaRouter.patch('/:id/review', idParamValidation, validate, controller.review);
 adminDakhalaRouter.patch('/:id/approve', idParamValidation, validate, controller.approve);

@@ -51,6 +51,7 @@ async function makeCitizen(mobile = '9876500001') {
     password: 'Secret@123',
     village: 'Sakharale',
     address: 'Road',
+    ward: 'Ward 1',
   });
   const user = await User.findOne({ mobile });
   return { token: res.body.data.token, id: user.id };

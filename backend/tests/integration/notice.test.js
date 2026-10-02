@@ -55,6 +55,7 @@ async function citizenToken(mobile = '9876500001') {
     password: 'Secret@123',
     village: 'Sakharale',
     address: 'Road',
+    ward: 'Ward 1',
   });
   return res.body.data.token;
 }

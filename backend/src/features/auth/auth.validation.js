@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { VALIDATION } from '@dgp/shared';
+import { VALIDATION, WARDS } from '@dgp/shared';
 
 export const registerValidation = [
   body('fullName')
@@ -12,6 +12,9 @@ export const registerValidation = [
     .withMessage(`Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters`),
   body('village').trim().notEmpty().withMessage('Village is required'),
   body('address').trim().notEmpty().withMessage('Address is required'),
+  // Required here and nowhere else. The schema leaves ward optional so accounts created
+  // before wards existed still save; this is the one gate new accounts pass through.
+  body('ward').isIn(WARDS).withMessage('Choose your ward'),
   body('email').optional({ values: 'falsy' }).isEmail().withMessage('Enter a valid email'),
 ];
 

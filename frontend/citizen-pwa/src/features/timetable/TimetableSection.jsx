@@ -68,6 +68,16 @@ function ServiceCard({ serviceKey, icon: Icon, entries }) {
                 ) : null}
               </div>
               <div className="shrink-0 text-right">
+                {/*
+                 * Which ward the slot applies to. The backend has already narrowed the list
+                 * to this citizen's ward plus the village-wide entries, so this label states
+                 * what arrived — it does not filter again. A slot with no ward predates the
+                 * ward field and was published village-wide, so it reads as general rather
+                 * than claiming a ward it may not belong to.
+                 */}
+                <p className="text-caption font-medium text-foreground">
+                  {e.ward ? t(`timetable.ward.${e.ward}`, e.ward) : t('timetable.ward.general')}
+                </p>
                 <p className="text-caption font-medium text-primary">
                   {t(`timetable.day.${e.day}`, e.day)}
                 </p>

@@ -7,6 +7,8 @@ import { Select } from '@/components/ui/input';
 import { SkeletonRows } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterBar, SearchInput } from '@/components/FilterBar';
+import { WardFilter } from '@/components/WardFilter';
+import { WardCell } from './WardCell';
 import { Pagination } from '@/components/Pagination';
 import {
   TableShell,
@@ -21,16 +23,25 @@ import {
 import { useUsers } from './hooks';
 
 const LIMIT = 20;
-const COLS = 5;
+const COLS = 6; // name, mobile, village, ward, joined, status
 
 export function UsersList() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'mr' ? 'mr' : 'en';
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('');
+  const [ward, setWard] = useState('');
   const [page, setPage] = useState(1);
 
-  const params = { page, limit: LIMIT, ...(q ? { q } : {}), ...(status ? { status } : {}) };
+  // Sent to the API, not applied to the page it returns: the list is server-paginated,
+  // so filtering in the browser would only filter the slice already on screen.
+  const params = {
+    page,
+    limit: LIMIT,
+    ...(q ? { q } : {}),
+    ...(status ? { status } : {}),
+    ...(ward ? { ward } : {}),
+  };
   const { data, isLoading, isError } = useUsers(params);
   const rows = data?.data ?? [];
   const total = data?.total ?? 0;
@@ -57,6 +68,7 @@ export function UsersList() {
           <option value="active">{t('users.active')}</option>
           <option value="inactive">{t('users.inactive')}</option>
         </Select>
+        <WardFilter value={ward} onChange={onFilter(setWard)} variant="people" />
       </FilterBar>
 
       <TableShell className="max-h-[calc(100dvh-16rem)] overflow-y-auto">
@@ -66,6 +78,7 @@ export function UsersList() {
               <TH>{t('users.name')}</TH>
               <TH>{t('users.mobile')}</TH>
               <TH>{t('users.village')}</TH>
+              <TH>{t('ward.label')}</TH>
               <TH>{t('users.joined')}</TH>
               <TH>{t('users.status')}</TH>
             </tr>
@@ -100,6 +113,9 @@ export function UsersList() {
                   </TD>
                   <TD className="text-muted-foreground">{u.mobile || '—'}</TD>
                   <TD className="text-muted-foreground">{u.village || '—'}</TD>
+                  <TD>
+                    <WardCell user={u} />
+                  </TD>
                   <TD className="whitespace-nowrap text-muted-foreground">
                     {formatDate(u.createdAt, locale)}
                   </TD>

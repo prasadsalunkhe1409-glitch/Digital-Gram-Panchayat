@@ -55,6 +55,7 @@ async function citizen(mobile = '9876500001') {
       password: 'Secret@123',
       village: 'Sakharale',
       address: 'Road',
+      ward: 'Ward 1',
     });
   const u = await User.findOne({ mobile });
   return { token: res.body.data.token, id: u.id };

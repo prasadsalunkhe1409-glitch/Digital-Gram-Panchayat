@@ -1,5 +1,12 @@
-import { ROLES, CERT_TYPE_FIELDS, CERT_DOC_REQUIREMENTS, CERT_DOC_TYPES } from '@dgp/shared';
+import {
+  ROLES,
+  CERT_TYPES,
+  CERT_TYPE_FIELDS,
+  CERT_DOC_REQUIREMENTS,
+  CERT_DOC_TYPES,
+} from '@dgp/shared';
 import { parsePagination } from '../../utils/pagination.js';
+import { citizenIdsFor } from '../../utils/ward.js';
 import { CertificateApplication } from './certificate.model.js';
 import { generateCertificatePdf } from './pdf.service.js';
 import { generateVerificationId, generateQrPngBuffer } from './qr.service.js';
@@ -237,7 +244,16 @@ export async function getCertificate(id, user) {
   };
 }
 
-/** @param {object} query */
+/**
+ * Officer certificate list.
+ *
+ * Ward is resolved through the applicant, not stored on the application. Historical records
+ * predate the ward field entirely and are not rewritten to carry one — the officer's filter
+ * asks "whose citizen is in this ward", which is a question the User collection can answer in
+ * one query without touching a single historical document.
+ *
+ * @param {object} query
+ */
 export async function adminList(query) {
   const { page, limit, skip } = parsePagination(query);
   const filter = { isActive: true };
@@ -246,6 +262,13 @@ export async function adminList(query) {
   if (query.q) {
     const rx = new RegExp(escapeRegex(query.q), 'i');
     filter.$or = [{ applicationId: rx }];
+  }
+  if (query.ward) {
+    const wardIds = await citizenIdsFor({ ward: query.ward });
+    // Nobody in that ward means nothing to show. Returning early stops the filter quietly
+    // doing nothing and handing the officer every application instead.
+    if (!wardIds || wardIds.length === 0) return { data: [], total: 0, page, limit };
+    filter.citizenId = { $in: wardIds };
   }
 
   const [items, total] = await Promise.all([
@@ -448,4 +471,77 @@ export async function softDelete(id, officerId) {
   await app.save();
   await audit(officerId, ROLES.OFFICER, 'dakhala.delete', app, null, { isActive: false });
   return { id: app.id };
+}
+
+/**
+ * An officer records a certificate the Panchayat is issuing directly, rather than one a
+ * citizen applied for — a marriage registered at the counter, a birth recorded from the
+ * hospital's paperwork.
+ *
+ * Built entirely out of the existing pieces: the same type field definitions, the same
+ * required-document groups, the same magic-byte-checked upload path, the same counter, the
+ * same `approve()` that mints the number, renders the PDF and writes the audit entry. There
+ * is one certificate pipeline, and this is a different door into it — a second implementation
+ * would be a second place for the certificate format to drift.
+ *
+ * Two things differ from a citizen application:
+ *   - the type must be one a citizen could apply for today, so Residence cannot be created
+ *     here even though the schema still accepts it on historical rows;
+ *   - the record is raised and approved in one movement, because the officer is holding the
+ *     documents as they enter them. The application history still records both steps.
+ *
+ * @param {{ officerId: string, body: object, files: object[] }} params
+ */
+export async function createByOfficer({ officerId, body, files }) {
+  const certificateType = body.certificateType;
+  // CERT_TYPES, not CERT_TYPE_FIELDS: the field map still holds Residence so historical
+  // records render, but nothing new may be issued under a withdrawn type.
+  if (!CERT_TYPES.includes(certificateType)) {
+    throw new AppError(400, 'VALIDATION_ERROR', 'Invalid certificate type', {
+      certificateType: 'This certificate type is not available for new certificates',
+    });
+  }
+
+  const citizen = await User.findOne({ _id: body.citizenId, role: ROLES.CITIZEN }).catch(
+    () => null,
+  );
+  if (!citizen) throw new AppError(404, 'CITIZEN_NOT_FOUND', 'Citizen not found');
+
+  const applicationData = parseApplicationData(body.applicationData);
+  validateApplicationData(certificateType, applicationData);
+
+  const documentMeta = parseDocumentMeta(body.documentMeta);
+  validateRequiredDocuments(certificateType, documentMeta);
+
+  const uploaded = await uploadAttachments(files, 'certificates/docs');
+  const uploadedDocuments = uploaded.map((doc, i) => ({
+    ...doc,
+    group: documentMeta[i]?.group,
+    docType: documentMeta[i]?.docType,
+  }));
+
+  const year = new Date().getFullYear();
+  const seq = await getNextSequence(`dakhala-${year}`);
+
+  const app = await CertificateApplication.create({
+    applicationId: buildApplicationId(year, seq),
+    citizenId: citizen.id,
+    certificateType,
+    applicationData,
+    uploadedDocuments,
+    status: 'Submitted',
+    // `by` is the officer: this record was raised at the counter, and the history should say
+    // so rather than implying the citizen filed it.
+    history: [{ status: 'Submitted', by: officerId, at: new Date() }],
+    createdBy: officerId,
+  });
+
+  await audit(officerId, ROLES.OFFICER, 'dakhala.officerCreate', app, null, {
+    applicationId: app.applicationId,
+    certificateType,
+    citizenId: citizen.id,
+  });
+
+  // The existing issuance path: number, verification id, PDF, notification, audit.
+  return approve(app.id, officerId);
 }

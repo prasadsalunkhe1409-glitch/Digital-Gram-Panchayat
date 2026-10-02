@@ -7,7 +7,7 @@ import { notifyWelcome } from '../notifications/notification.service.js';
 
 /**
  * Register a citizen. Mobile must be unique. Returns sanitized user + JWT.
- * @param {{ fullName: string, mobile: string, password: string, village: string, address: string, email?: string }} input
+ * @param {{ fullName: string, mobile: string, password: string, village: string, address: string, ward: string, email?: string }} input
  */
 export async function registerCitizen(input) {
   const existing = await User.findOne({ mobile: input.mobile });
@@ -23,6 +23,7 @@ export async function registerCitizen(input) {
     email: input.email || undefined,
     village: input.village,
     address: input.address,
+    ward: input.ward,
     passwordHash,
   });
 

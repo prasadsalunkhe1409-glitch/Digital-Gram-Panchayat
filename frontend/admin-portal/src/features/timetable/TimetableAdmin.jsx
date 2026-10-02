@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, Pencil } from 'lucide-react';
-import { TIMETABLE_SERVICES, TIMETABLE_DAYS } from '@dgp/shared';
+import { TIMETABLE_SERVICES, TIMETABLE_DAYS, WARD_ALL } from '@dgp/shared';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { controlClass } from '@/components/ui/input';
 import { Dialog } from '@/components/ui/dialog';
 import { QueryError } from '@/components/QueryError';
+import { WardFilter, wardLabel } from '@/components/WardFilter';
 import {
   TableShell,
   Table,
@@ -23,6 +24,9 @@ import { useAdminTimetable, useTimetableMutations } from './hooks';
 
 const EMPTY = {
   serviceType: 'Ghantagadi',
+  // Village-wide by default: the safe answer when an officer has not said otherwise, and the
+  // only one that cannot quietly publish a time to the wrong street.
+  ward: WARD_ALL,
   title: '',
   titleMr: '',
   area: '',
@@ -36,7 +40,7 @@ const EMPTY = {
   isPublished: false,
 };
 
-const COLS = 6;
+const COLS = 7; // service, ward, title, day, time, published, actions
 
 /**
  * Ghantagadi and water-supply schedules.
@@ -47,7 +51,12 @@ const COLS = 6;
  */
 export function TimetableAdmin() {
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch } = useAdminTimetable();
+  const [wardFilter, setWardFilter] = useState('');
+  // Sent to the API; the officer list is not paginated in the browser either way, but the
+  // filter belongs where the data is so it stays consistent with every other screen.
+  const { data, isLoading, isError, refetch } = useAdminTimetable(
+    wardFilter ? { ward: wardFilter } : undefined,
+  );
   const { create, update, remove } = useTimetableMutations();
 
   const [open, setOpen] = useState(false);
@@ -112,10 +121,13 @@ export function TimetableAdmin() {
           <h1 className="text-title text-foreground">{t('timetable.title')}</h1>
           <p className="mt-0.5 text-caption text-muted-foreground">{t('timetable.subtitle')}</p>
         </div>
-        <Button onClick={openNew}>
-          <Plus className="h-4 w-4" />
-          {t('timetable.new')}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <WardFilter value={wardFilter} onChange={setWardFilter} variant="schedule" />
+          <Button onClick={openNew}>
+            <Plus className="h-4 w-4" />
+            {t('timetable.new')}
+          </Button>
+        </div>
       </div>
 
       <TableShell>
@@ -123,6 +135,7 @@ export function TimetableAdmin() {
           <THead>
             <TR>
               <TH>{t('timetable.field.serviceType')}</TH>
+              <TH>{t('ward.label')}</TH>
               <TH>{t('timetable.field.title')}</TH>
               <TH>{t('timetable.field.day')}</TH>
               <TH>{t('timetable.field.startTime')}</TH>
@@ -142,6 +155,12 @@ export function TimetableAdmin() {
               rows.map((r) => (
                 <TR key={r.id}>
                   <TD className="whitespace-nowrap">{t(`timetable.service.${r.serviceType}`)}</TD>
+                  <TD className="whitespace-nowrap">
+                    {/* Legacy entries carry no ward and read as such — never as a guess. */}
+                    <span className={r.ward ? 'text-foreground' : 'text-muted-foreground'}>
+                      {wardLabel(r.ward, t)}
+                    </span>
+                  </TD>
                   <TD>
                     <span className="block">{r.title}</span>
                     {r.area ? (
@@ -232,6 +251,20 @@ export function TimetableAdmin() {
                     </option>
                   ))}
                 </select>
+              )}
+            </Field>
+            <Field label={t('ward.label')}>
+              {({ id }) => (
+                /* The six wards plus village-wide. Not 'schedule', which also offers the
+                   'unset' filter token — nothing may be *assigned* no ward. */
+                <WardFilter
+                  id={id}
+                  value={values.ward}
+                  onChange={(v) => setValues((cur) => ({ ...cur, ward: v }))}
+                  variant="scheduleAssign"
+                  includeAll={false}
+                  className="w-full"
+                />
               )}
             </Field>
             <Field label={t('timetable.field.day')}>

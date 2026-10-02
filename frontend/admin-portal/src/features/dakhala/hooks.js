@@ -39,3 +39,12 @@ export function useReviewMutations(id) {
     }),
   };
 }
+
+/** Officer-created certificate. Invalidates the list so the new record appears at once. */
+export function useOfficerCreateCertificate() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ values, files }) => certificateService.officerCreate(values, files),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-dakhala'] }),
+  });
+}

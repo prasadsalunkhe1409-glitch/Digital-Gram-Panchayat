@@ -49,6 +49,7 @@ async function citizen() {
     password: 'Secret@123',
     village: 'Sakharale',
     address: 'Road',
+    ward: 'Ward 1',
   });
   return res.body.data.token;
 }

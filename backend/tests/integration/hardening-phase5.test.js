@@ -55,7 +55,14 @@ async function officerToken() {
 async function citizenToken(mobile = '9876500001') {
   const res = await request(app)
     .post('/api/v1/auth/register')
-    .send({ fullName: 'Citizen', mobile, password: 'Secret@123', village: 'S', address: 'R' });
+    .send({
+      fullName: 'Citizen',
+      mobile,
+      password: 'Secret@123',
+      village: 'S',
+      address: 'R',
+      ward: 'Ward 1',
+    });
   return res.body.data.token;
 }
 

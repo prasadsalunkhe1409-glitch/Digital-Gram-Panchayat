@@ -10,11 +10,9 @@ import {
   CalendarCheck,
   IndianRupee,
   Languages,
-  Moon,
-  Sun,
 } from 'lucide-react';
 import { formatCurrency, formatDate, formatDateTime } from '@dgp/shared';
-import { useTheme, useLanguage } from '@/store';
+import { useLanguage } from '@/store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Banner } from '@/components/Banner';
@@ -51,7 +49,6 @@ export function Profile() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'mr' ? 'mr' : 'en';
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
 
@@ -176,19 +173,6 @@ export function Profile() {
             </span>
             <Button variant="outline" size="sm" onClick={toggleLanguage}>
               {language === 'mr' ? 'English' : 'मराठी'}
-            </Button>
-          </li>
-          <li className="flex min-h-14 items-center gap-3 px-4 py-2.5">
-            {theme === 'dark' ? (
-              <Moon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            ) : (
-              <Sun className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            )}
-            <span className="min-w-0 flex-1 truncate text-body text-foreground">
-              {t('settings.theme')}
-            </span>
-            <Button variant="outline" size="sm" onClick={toggleTheme}>
-              {t(theme === 'dark' ? 'nav.themeLight' : 'nav.themeDark')}
             </Button>
           </li>
         </ul>

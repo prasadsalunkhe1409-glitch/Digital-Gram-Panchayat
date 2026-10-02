@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { TIMETABLE_SERVICES, TIMETABLE_DAYS } from '@dgp/shared';
+import { TIMETABLE_SERVICES, TIMETABLE_DAYS, TIMETABLE_WARDS } from '@dgp/shared';
 
 const { Schema, model } = mongoose;
 
@@ -25,7 +25,26 @@ const timetableEntrySchema = new Schema(
     title: { type: String, required: true, trim: true },
     titleMr: { type: String, default: '', trim: true },
 
-    /** Which ward, lane or tank this slot covers. Optional — some villages run one route. */
+    /**
+     * Which ward this slot applies to, or 'All Wards' for a village-wide schedule.
+     *
+     * Distinct from `area` below, which stays exactly as it was: `area` is descriptive — the
+     * lane, the tank, the stretch of road — and is printed for the citizen to recognise.
+     * `ward` is administrative: it decides who the slot is shown to and which officer filter
+     * it falls under. Collapsing the two would make a filter depend on prose.
+     *
+     * Nullable, and null is not backfilled. Entries published before wards existed were
+     * published to the whole village, so they keep being shown to the whole village — the one
+     * reading that neither hides a live schedule nor claims it belongs to a ward it may not.
+     */
+    ward: {
+      type: String,
+      enum: { values: [...TIMETABLE_WARDS, null], message: 'Invalid ward' },
+      default: null,
+      index: true,
+    },
+
+    /** Which lane, tank or stretch this slot covers. Descriptive, not administrative. */
     area: { type: String, default: '', trim: true },
     areaMr: { type: String, default: '', trim: true },
 
@@ -60,6 +79,12 @@ const timetableEntrySchema = new Schema(
 );
 
 // The citizen query: published slots for a service, in the order an officer arranged them.
-timetableEntrySchema.index({ isActive: 1, isPublished: 1, serviceType: 1, displayOrder: 1 });
+timetableEntrySchema.index({
+  isActive: 1,
+  isPublished: 1,
+  ward: 1,
+  serviceType: 1,
+  displayOrder: 1,
+});
 
 export const TimetableEntry = model('TimetableEntry', timetableEntrySchema);

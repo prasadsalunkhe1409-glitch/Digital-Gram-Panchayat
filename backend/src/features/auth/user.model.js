@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ROLES } from '@dgp/shared';
+import { ROLES, WARDS } from '@dgp/shared';
 
 const { Schema, model } = mongoose;
 
@@ -44,6 +44,20 @@ const userSchema = new Schema(
     village: {
       type: String,
       trim: true,
+    },
+    /*
+     * The citizen's ward.
+     *
+     * Required at registration, optional in the schema. Those are not in conflict: accounts
+     * created before wards existed have none, and making the field required would make every
+     * one of them fail to save the next time an officer touched it. Nothing is backfilled —
+     * an officer assigns the ward from User Management, and until then it reads "Ward not set".
+     */
+    ward: {
+      type: String,
+      enum: { values: [...WARDS, null], message: 'Invalid ward' },
+      default: null,
+      index: true,
     },
     address: {
       type: String,

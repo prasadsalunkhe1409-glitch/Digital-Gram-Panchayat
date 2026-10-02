@@ -1,3 +1,4 @@
+import { WARD_FILTER_VALUES } from '../../utils/ward.js';
 import { body, param, query } from 'express-validator';
 import { COMPLAINT_CATEGORIES, COMPLAINT_STATUSES } from '@dgp/shared';
 
@@ -41,4 +42,10 @@ export const listQueryValidation = [
   query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
   query('status').optional().isIn(COMPLAINT_STATUSES),
   query('category').optional().isIn(COMPLAINT_CATEGORIES),
+  /*
+   * The service already read `query.ward` and built a filter from it, but nothing validated
+   * it — an unchecked value went straight into a Mongo filter. Stored complaint wards are
+   * free text from before this change, so 'unset' here matches null and '' as well.
+   */
+  query('ward').optional().isIn(WARD_FILTER_VALUES),
 ];
