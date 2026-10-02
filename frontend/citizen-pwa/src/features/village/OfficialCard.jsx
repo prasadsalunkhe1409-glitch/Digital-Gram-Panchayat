@@ -102,6 +102,26 @@ export function OfficialCard({ member, variant = 'full' }) {
               {t('directory.ward')}: {member.ward}
             </p>
           ) : null}
+          {/*
+           * The number itself, on the compact card too.
+           *
+           * The compact card carried a "Call" button and nothing else, so a citizen on the
+           * home page could dial the member but could not read, write down or dictate the
+           * number — and on a desktop, where tel: does nothing useful, the button was the
+           * only thing there. The digits are now on the card in both variants.
+           */}
+          {compact && member.mobile ? (
+            <p className="mt-0.5 flex items-center gap-1.5 text-caption text-muted-foreground">
+              <Phone className="h-3 w-3 shrink-0" aria-hidden="true" />
+              <a
+                href={`tel:${member.mobile}`}
+                aria-label={`${t('directory.call')} ${member.name || ''} ${member.mobile}`}
+                className="tabular-nums text-foreground hover:text-primary"
+              >
+                {member.mobile}
+              </a>
+            </p>
+          ) : null}
         </div>
       </div>
 
