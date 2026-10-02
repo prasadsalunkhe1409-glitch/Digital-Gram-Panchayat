@@ -24,6 +24,10 @@
     --surface: 214 38% 95%; /* #EEF2F7 */
 
     /* Brand — royal blue #1E3A8A, hover #1B3378, light tint #DBEAFE (also selected-row wash). */
+    /* Ink for a chip whose background is fixed white in BOTH themes — the event-card
+       countdown sits on artwork, so its own surface never flips. Deliberately NOT redefined
+       in the dark block: a theme-flipping value here is what made it 3.17:1 before. 10.4:1. */
+    --brand-ink: 224 64% 25%;
     --primary: 224 64% 33%; /* #1E3A8A */
     --primary-hover: 224 64% 27%; /* darker #1E3A8A */
     --primary-foreground: 0 0% 100%;

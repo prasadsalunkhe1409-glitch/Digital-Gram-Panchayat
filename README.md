@@ -9,12 +9,33 @@ backed by one Node/Express REST API.
 
 - **Citizen:** register/login, file & track complaints (with photos + GPS, works offline),
   read notices & government schemes, view tax dues, apply for and download certificates,
-  in-app notifications, install-to-home-screen, full offline reading, EN/MR.
+  see the Ghantagadi and water-supply timetable and the Panchayat members' numbers on the home
+  page, in-app notifications, install-to-home-screen, full offline reading, EN/MR.
 - **Officer:** live dashboard, resolve complaints, review/approve/reject certificates (auto
-  PDF), manage notices/schemes/tax, broadcast SMS/voice/in-app notifications, user management,
-  audit trail.
+  PDF), manage notices/schemes/tax, publish the service timetable, broadcast SMS/voice/in-app
+  notifications, user management, audit trail.
 - **Platform:** JWT auth + role gates, idempotent submissions, rate limiting, Helmet + strict
   CORS, provider-agnostic notifications, append-only audit log, 80%+ backend test coverage.
+
+### Certificate types
+
+New applications offer **Marriage**, Birth, Death, 7/12 & 8A and Other.
+
+**Residence is withdrawn, not deleted.** It is absent from the application form and the create
+endpoint rejects it with 400, but the schema, the officer list filter and the label maps still
+accept it, so every Residence application already in the database keeps opening, printing and
+appearing in officer filters. Narrowing the schema enum instead would have made those records
+unsaveable. The split lives in `@dgp/shared`: `CERT_TYPES` is what may be chosen, `CERT_TYPES_ALL`
+is what may be stored.
+
+No migration is needed and none is supplied — nothing about existing rows changes.
+
+### Timetable
+
+`GET /api/v1/timetable` returns the published Ghantagadi and water-supply schedule, grouped by
+service; officers manage it under `/api/v1/admin/timetable` and at `/timetable` in the portal.
+Nothing is seeded: an unpublished service renders an explicit "not published yet" rather than a
+placeholder timing.
 
 ## Monorepo layout
 

@@ -132,3 +132,46 @@ verification all derive from those maps.
 - Every apply / review / approve / reject / delete writes an `auditlogs` entry.
 - Approve + reject call the notification service (`dakhalaUpdate`, mock SMS in M1–M7).
 - Documents + generated PDF use Cloudinary (mock URL when unconfigured).
+
+## Timetable
+
+Village service schedules — Ghantagadi (waste collection) and water supply.
+
+### `GET /api/v1/timetable` — public
+
+Returns the **published** schedule, grouped by service. Both services always appear, with an
+empty array when nothing is published, so a client can distinguish "not published yet" from a
+missing key.
+
+```json
+{
+  "Ghantagadi": [
+    {
+      "id": "...",
+      "serviceType": "Ghantagadi",
+      "title": "Ward 1 waste collection",
+      "titleMr": "प्रभाग १ कचरा संकलन",
+      "area": "Ward 1",
+      "day": "Monday",
+      "startTime": "07:30",
+      "endTime": "09:00"
+    }
+  ],
+  "WaterSupply": [],
+  "updatedAt": "2026-10-02T09:12:00.000Z"
+}
+```
+
+### Officer endpoints
+
+| Method   | Path                          | Notes                                    |
+| -------- | ----------------------------- | ---------------------------------------- |
+| `GET`    | `/api/v1/admin/timetable`     | All entries, published or draft          |
+| `POST`   | `/api/v1/admin/timetable`     | Creates one slot; unpublished by default |
+| `PUT`    | `/api/v1/admin/timetable/:id` | Patch; validated to the same rules       |
+| `DELETE` | `/api/v1/admin/timetable/:id` | Soft delete                              |
+
+`serviceType` is `Ghantagadi` or `WaterSupply`. `day` is `Daily` or a weekday name.
+`startTime` and `endTime` are 24-hour `HH:mm` — anchored, so `9:00` and `25:00` are rejected on
+both create and update. `endTime` is optional: a collection round is often a single arrival
+time rather than a window.

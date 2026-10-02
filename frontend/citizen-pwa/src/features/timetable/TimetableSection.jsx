@@ -4,6 +4,7 @@ import { SectionHeader } from '@/components/PageHeader';
 import { Card } from '@/components/ui/card';
 import { SkeletonList } from '@/components/Skeleton';
 import { QueryError } from '@/components/QueryError';
+import { NoTimetableArt } from '@/components/Illustration';
 import { useTimetable } from './hooks';
 
 const SERVICES = [
@@ -43,9 +44,10 @@ function ServiceCard({ serviceKey, icon: Icon, entries }) {
          * a guessed time on a public page sends a citizen to the roadside with their bin at an
          * hour nobody collects.
          */
-        <p className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-body text-muted-foreground">
-          {t('timetable.empty')}
-        </p>
+        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border px-3 py-5 text-center">
+          <NoTimetableArt className="h-16 w-16 text-muted-foreground" />
+          <p className="text-body text-muted-foreground">{t('timetable.empty')}</p>
+        </div>
       ) : (
         <ul className="divide-y divide-border">
           {entries.map((e) => (

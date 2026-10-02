@@ -174,3 +174,15 @@ export function NotFoundArt(props) {
     </Frame>
   );
 }
+
+/** A clock over a calendar page — a schedule that has not been published yet. */
+export function NoTimetableArt(props) {
+  return (
+    <Frame {...props}>
+      <rect x="30" y="34" width="46" height="46" rx="4" {...stroke} />
+      <path d="M30 46h46M44 28v10M62 28v10" {...stroke} />
+      <circle cx="78" cy="74" r="18" {...stroke} />
+      <path d="M78 64v10l7 5" {...stroke} />
+    </Frame>
+  );
+}

@@ -81,7 +81,7 @@ export function EventCard({ event, featured = false }) {
           loading={featured ? 'eager' : 'lazy'}
           className={`w-full object-cover ${featured ? 'h-44 sm:h-56' : 'h-32'}`}
         />
-        <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-caption font-semibold text-blue-900 shadow-sm">
+        <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-caption font-semibold text-[hsl(var(--brand-ink))] shadow-sm">
           {countdownLabel(event.startDate, t)}
         </span>
       </div>
