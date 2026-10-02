@@ -15,14 +15,17 @@ const PNG = Buffer.from(
   'base64',
 );
 const DATA = {
-  fullName: 'Test Citizen',
+  groomName: 'Test Groom',
+  brideName: 'Test Bride',
+  marriageDate: '2026-02-14',
+  marriagePlace: 'Sakharale',
   mobile: '9876500002',
   address: '12 Main Road',
 };
 
 const DOCS = [
-  { group: 'identity', docType: 'Aadhaar' },
-  { group: 'address', docType: 'RationCard' },
+  { group: 'coupleIdentity', docType: 'Aadhaar' },
+  { group: 'marriageProof', docType: 'MarriageInvitation' },
   { group: 'selfDeclaration', docType: 'SelfDeclaration' },
 ];
 
@@ -75,7 +78,7 @@ async function apply(token) {
   const req = request(app)
     .post('/api/v1/dakhala')
     .set('Authorization', `Bearer ${token}`)
-    .field('certificateType', 'Residence')
+    .field('certificateType', 'Marriage')
     .field('applicationData', JSON.stringify(DATA))
     .field('documentMeta', JSON.stringify(DOCS));
   DOCS.forEach((d, i) =>
@@ -206,5 +209,50 @@ describe('officer soft-delete', () => {
       .set('Authorization', `Bearer ${cToken}`);
     expect(res.status).toBe(404);
     expect(res.body.error.code).toBe('CERTIFICATE_NOT_READY');
+  });
+});
+
+/**
+ * Residence was withdrawn when Marriage replaced it. Two things have to stay true at once:
+ * nobody can file a new Residence application, and every Residence application already in the
+ * database still opens. Narrowing the schema enum would have satisfied the first and broken
+ * the second, so the refusal lives in the create validator and the schema still admits the type.
+ */
+describe('a withdrawn certificate type', () => {
+  it('refuses a new Residence application', async () => {
+    const token = await citizenToken('9876500077');
+    const res = await request(app)
+      .post('/api/v1/dakhala')
+      .set('Authorization', `Bearer ${token}`)
+      .field('certificateType', 'Residence')
+      .field('applicationData', JSON.stringify({ fullName: 'X', mobile: '9876500077' }))
+      .field('documentMeta', JSON.stringify([{ group: 'identity', docType: 'Aadhaar' }]))
+      .attach('documents', PNG, { filename: 'id.png', contentType: 'image/png' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.fields.certificateType).toBeDefined();
+  });
+
+  it('still stores and returns a historical Residence record', async () => {
+    const oToken = await officerToken();
+    // Written straight to the collection, the way an existing record arrived before the change.
+    const existing = await CertificateApplication.create({
+      applicationId: 'DKH-2025-009999',
+      citizenId: new mongoose.Types.ObjectId(),
+      certificateType: 'Residence',
+      applicationData: { fullName: 'Old Applicant', mobile: '9876500078', address: 'Old Road' },
+      status: 'Approved',
+      createdBy: new mongoose.Types.ObjectId(),
+    });
+
+    expect(existing.certificateType).toBe('Residence');
+
+    // And an officer can still find it: the list filter accepts the withdrawn type.
+    const res = await request(app)
+      .get('/api/v1/admin/dakhala?certificateType=Residence')
+      .set('Authorization', `Bearer ${oToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.data.some((a) => a.applicationId === 'DKH-2025-009999')).toBe(true);
   });
 });

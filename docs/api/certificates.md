@@ -10,7 +10,7 @@ Apply. `multipart/form-data`. Role: **citizen**.
 
 | Field           | Type        | Notes                                                              |
 | --------------- | ----------- | ------------------------------------------------------------------ |
-| certificateType | string      | Residence / Income / Birth / Death / Character / Other             |
+| certificateType | string      | Marriage / Birth / Death / SevenTwelve / Other                     |
 | applicationData | JSON string | type-specific fields (see below); required keys validated per type |
 | documents       | file[]      | optional, ≤5, PDF or image, ≤5MB each                              |
 
@@ -60,7 +60,9 @@ notifies the citizen, audits. `409` if already Approved.
 
 ## Per-type required fields (`applicationData`)
 
-- **Residence**: fullName, address, yearsOfResidence, purpose
+- **Marriage**: groomName, brideName, marriageDate, marriagePlace, mobile, address
+- _Residence_ is withdrawn from new applications. Existing Residence records still read,
+  download and appear in the officer filter; `POST` rejects the type with 400.
 - **Income**: fullName, annualIncome, occupation, purpose
 - **Birth**: childName, dateOfBirth, placeOfBirth, fatherName, motherName
 - **Death**: deceasedName, dateOfDeath, placeOfDeath, relationToApplicant
@@ -97,7 +99,7 @@ Public, rate-limited. Looks a certificate up by its scanned `verificationId` or 
 {
   "valid": true,
   "status": "Approved",
-  "certificateType": "Residence",
+  "certificateType": "Marriage",
   "certificateNumber": "CERT-RES-2026-000123",
   "applicantName": "…",
   "issuedAt": "…"

@@ -83,7 +83,24 @@ export const PAYMENT_STATUS_COLOR_MAP = {
   Paid: 'green',
 };
 
-export const CERT_TYPES = ['Residence', 'Birth', 'Death', 'SevenTwelve', 'Other'];
+/**
+ * Certificate types a citizen can apply for today. Drives the application form, create-time
+ * validation and the type labels.
+ */
+export const CERT_TYPES = ['Marriage', 'Birth', 'Death', 'SevenTwelve', 'Other'];
+
+/**
+ * Types withdrawn from new applications but still held in the database.
+ *
+ * Residence certificates were issued before Marriage replaced them. Those records must keep
+ * opening, printing and appearing in officer filters, so the type stays valid everywhere a
+ * stored record is read — it is only absent from the list a citizen can choose from. Dropping
+ * it from the model enum instead would make every historical application unsaveable.
+ */
+export const CERT_TYPES_LEGACY = ['Residence'];
+
+/** Every type that may appear on a stored record: use this for schemas, filters and labels. */
+export const CERT_TYPES_ALL = [...CERT_TYPES, ...CERT_TYPES_LEGACY];
 
 export const DAKHALA_STATUSES = ['Submitted', 'UnderReview', 'Approved', 'Rejected'];
 
@@ -97,6 +114,16 @@ export const DAKHALA_STATUS_COLOR_MAP = {
 // Dynamic per-type application fields. Backend validates required keys against these;
 // the citizen form renders inputs from the same map (single source).
 export const CERT_TYPE_FIELDS = {
+  Marriage: [
+    { key: 'groomName', label: "Groom's full name", type: 'text', required: true },
+    { key: 'brideName', label: "Bride's full name", type: 'text', required: true },
+    { key: 'marriageDate', label: 'Date of marriage', type: 'date', required: true },
+    { key: 'marriagePlace', label: 'Place of marriage', type: 'text', required: true },
+    { key: 'mobile', label: 'Mobile number', type: 'text', required: true },
+    { key: 'address', label: 'Address', type: 'textarea', required: true },
+  ],
+  // Kept so a historical Residence application still renders its own fields on the detail
+  // screen. It is not offered for new applications — see CERT_TYPES_LEGACY.
   Residence: [
     { key: 'fullName', label: 'Full name', type: 'text', required: true },
     { key: 'mobile', label: 'Mobile number', type: 'text', required: true },
@@ -148,6 +175,9 @@ export const CERT_DOC_TYPES = [
   'Existing712',
   'Existing8A',
   'PropertyRecord',
+  'MarriageInvitation',
+  'MarriagePhotograph',
+  'WitnessIdentity',
   'Supporting',
 ];
 
@@ -157,6 +187,21 @@ export const CERT_DOC_TYPES = [
  * uploader per group from the same map (single source of truth).
  */
 export const CERT_DOC_REQUIREMENTS = {
+  Marriage: [
+    {
+      key: 'coupleIdentity',
+      required: true,
+      anyOf: ['Aadhaar', 'PAN', 'VoterId', 'Passport', 'DrivingLicence'],
+    },
+    {
+      key: 'marriageProof',
+      required: true,
+      anyOf: ['MarriageInvitation', 'MarriagePhotograph'],
+    },
+    { key: 'witnessIdentity', required: false, anyOf: ['WitnessIdentity', 'Aadhaar'] },
+    { key: 'selfDeclaration', required: true, anyOf: ['SelfDeclaration'] },
+  ],
+  // Retained for historical records only. See CERT_TYPES_LEGACY.
   Residence: [
     {
       key: 'identity',

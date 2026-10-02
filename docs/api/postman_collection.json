@@ -1141,12 +1141,12 @@
               "formdata": [
                 {
                   "key": "certificateType",
-                  "value": "Residence",
+                  "value": "Marriage",
                   "type": "text"
                 },
                 {
                   "key": "applicationData",
-                  "value": "{\"fullName\":\"Ramesh\",\"address\":\"Main Road\",\"yearsOfResidence\":\"10\",\"purpose\":\"School\"}",
+                  "value": "{\"fullName\":\"Ramesh\",\"address\":\"Main Road\",\"yearsOfMarriage\":\"10\",\"purpose\":\"School\"}",
                   "type": "text"
                 },
                 {

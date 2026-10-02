@@ -20,6 +20,7 @@ const MUTED = '#475569';
 const HAIRLINE = '#CBD5E1';
 
 const TITLES = {
+  Marriage: 'Marriage Certificate',
   Residence: 'Residence Certificate',
   Birth: 'Birth Certificate',
   Death: 'Death Certificate',

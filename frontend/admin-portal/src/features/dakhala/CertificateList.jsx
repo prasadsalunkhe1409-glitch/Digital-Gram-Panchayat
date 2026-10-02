@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FileText } from 'lucide-react';
-import { CERT_TYPES, DAKHALA_STATUSES, formatDate } from '@dgp/shared';
+import { CERT_TYPES_ALL, DAKHALA_STATUSES, formatDate } from '@dgp/shared';
 import { Select } from '@/components/ui/input';
 import { SkeletonRows } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
@@ -75,7 +75,9 @@ export function CertificateList() {
           className="w-auto"
         >
           <option value="">{t('dakhala.dash.allTypes')}</option>
-          {CERT_TYPES.map((c) => (
+          {/* _ALL, not CERT_TYPES: an officer still has to be able to filter the
+              Residence applications that were filed before Marriage replaced them. */}
+          {CERT_TYPES_ALL.map((c) => (
             <option key={c} value={c}>
               {t(`dakhala.type.${c}`, c)}
             </option>

@@ -14,7 +14,7 @@ import { useApplyCertificate } from '../hooks';
 export function ApplyCertificate() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [certificateType, setCertificateType] = useState('Residence');
+  const [certificateType, setCertificateType] = useState('Marriage');
   // One flat list of { file, group, docType } — the server needs files + positional metadata.
   const [docs, setDocs] = useState([]);
   const applyMutation = useApplyCertificate();

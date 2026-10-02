@@ -18,10 +18,17 @@ const PNG = Buffer.from(
   'base64',
 );
 
-const RESIDENCE_DATA = { fullName: 'Amit Patil', mobile: '9876500001', address: '5 Market Rd' };
-const RESIDENCE_DOCS = [
-  { group: 'identity', docType: 'Aadhaar' },
-  { group: 'address', docType: 'RationCard' },
+const MARRIAGE_DATA = {
+  groomName: 'Amit Patil',
+  brideName: 'Sneha Patil',
+  marriageDate: '2026-02-14',
+  marriagePlace: 'Sakharale',
+  mobile: '9876500001',
+  address: '5 Market Rd',
+};
+const MARRIAGE_DOCS = [
+  { group: 'coupleIdentity', docType: 'Aadhaar' },
+  { group: 'marriageProof', docType: 'MarriageInvitation' },
   { group: 'selfDeclaration', docType: 'SelfDeclaration' },
 ];
 
@@ -77,9 +84,9 @@ async function issueCertificate(edits) {
   const applyRes = await request(app)
     .post('/api/v1/dakhala')
     .set('Authorization', `Bearer ${cToken}`)
-    .field('certificateType', 'Residence')
-    .field('applicationData', JSON.stringify(RESIDENCE_DATA))
-    .field('documentMeta', JSON.stringify(RESIDENCE_DOCS))
+    .field('certificateType', 'Marriage')
+    .field('applicationData', JSON.stringify(MARRIAGE_DATA))
+    .field('documentMeta', JSON.stringify(MARRIAGE_DOCS))
     .attach('documents', PNG, { filename: 'a.png', contentType: 'image/png' })
     .attach('documents', PNG, { filename: 'b.png', contentType: 'image/png' })
     .attach('documents', PNG, { filename: 'c.png', contentType: 'image/png' });
@@ -100,7 +107,7 @@ describe('certificate issuance', () => {
   test('approval mints a certificate number, verification id and issue date', async () => {
     const cert = await issueCertificate();
     expect(cert.status).toBe('Approved');
-    expect(cert.certificateNumber).toMatch(/^CERT-RES-\d{4}-\d{6}$/);
+    expect(cert.certificateNumber).toMatch(/^CERT-MAR-\d{4}-\d{6}$/);
     expect(cert.verificationId).toMatch(/^[a-f0-9]{32}$/);
     expect(cert.issuedAt).toBeTruthy();
     expect(cert.pdfUrl).toBeTruthy();
@@ -112,7 +119,7 @@ describe('certificate issuance', () => {
       officerRemarks: 'Issued for school admission',
     });
     expect(cert.applicationData.address).toBe('99 New Colony');
-    expect(cert.applicationData.fullName).toBe('Amit Patil'); // untouched field preserved
+    expect(cert.applicationData.groomName).toBe('Amit Patil'); // untouched field preserved
     expect(cert.officerRemarks).toBe('Issued for school admission');
   });
 });
@@ -127,9 +134,9 @@ describe('public verification', () => {
     expect(res.body.data).toMatchObject({
       valid: true,
       status: 'Approved',
-      certificateType: 'Residence',
+      certificateType: 'Marriage',
       certificateNumber: cert.certificateNumber,
-      applicantName: 'Amit Patil',
+      applicantName: 'Amit Patil & Sneha Patil',
     });
   });
 

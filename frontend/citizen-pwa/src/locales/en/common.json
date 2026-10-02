@@ -411,7 +411,8 @@
       "Birth": "Birth Certificate",
       "Death": "Death Certificate",
       "SevenTwelve": "7/12 & 8A Certificate",
-      "Other": "Other Certificate"
+      "Other": "Other Certificate",
+      "Marriage": "Marriage Certificate"
     },
     "status": {
       "Submitted": "Submitted",
@@ -439,7 +440,11 @@
       "taluka": "Taluka",
       "district": "District",
       "certificateTitle": "Certificate title",
-      "description": "Description"
+      "description": "Description",
+      "groomName": "Groom's full name",
+      "brideName": "Bride's full name",
+      "marriageDate": "Date of marriage",
+      "marriagePlace": "Place of marriage"
     },
     "list": {
       "title": "My Certificates",
@@ -495,7 +500,10 @@
       "Existing712": "Existing 7/12",
       "Existing8A": "Existing 8A",
       "PropertyRecord": "Property Record",
-      "Supporting": "Supporting Document"
+      "Supporting": "Supporting Document",
+      "MarriageInvitation": "Marriage Invitation Card",
+      "MarriagePhotograph": "Marriage Photograph",
+      "WitnessIdentity": "Witness Identity Proof"
     },
     "docGroup": {
       "identity": "Identity proof",
@@ -509,7 +517,10 @@
       "addressProof": "Address proof",
       "applicantIdentity": "Applicant identity",
       "landProof": "Land proof",
-      "supporting": "Supporting documents"
+      "supporting": "Supporting documents",
+      "coupleIdentity": "Identity proof of bride and groom",
+      "marriageProof": "Proof of marriage",
+      "witnessIdentity": "Witness identity proof (optional)"
     },
     "stage": {
       "Submitted": "Submitted",

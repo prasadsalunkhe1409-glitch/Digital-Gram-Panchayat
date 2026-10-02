@@ -89,7 +89,7 @@ test('certificate application journey', async ({ page }) => {
   await register(page, mobile);
   await page.goto('/dakhala/new');
 
-  await page.getByLabel(/certificate type/i).selectOption('Residence');
+  await page.getByLabel(/certificate type/i).selectOption('Marriage');
   await page.getByLabel(/full name/i).fill('E2E Citizen');
   await page.getByLabel(/mobile/i).fill(mobile);
   await page.getByLabel(/address/i).fill('Main Road, Sakharale');

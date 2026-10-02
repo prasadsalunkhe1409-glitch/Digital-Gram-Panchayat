@@ -18,6 +18,7 @@ function buildApplicationId(year, seq) {
 
 // Short per-type code for the human-facing certificate serial.
 const CERT_TYPE_CODE = {
+  Marriage: 'MAR',
   Residence: 'RES',
   Birth: 'BIR',
   Death: 'DEA',
@@ -38,7 +39,22 @@ function toVerification(app) {
     status: app.status,
     certificateType: app.certificateType,
     certificateNumber: app.certificateNumber || null,
-    applicantName: app.applicationData?.fullName || app.applicationData?.childName || null,
+    /*
+     * Whose certificate this is, for the public verification response.
+     *
+     * Each type names its subject differently, so this walks the type-specific field before
+     * the generic one. Marriage has no `fullName` at all — without `groomName` here, verifying
+     * a genuine marriage certificate returned a null name, which makes the check worthless to
+     * whoever is holding the paper.
+     */
+    applicantName:
+      app.applicationData?.fullName ||
+      app.applicationData?.childName ||
+      app.applicationData?.deceasedName ||
+      (app.applicationData?.groomName && app.applicationData?.brideName
+        ? `${app.applicationData.groomName} & ${app.applicationData.brideName}`
+        : app.applicationData?.groomName) ||
+      null,
     issuedAt: app.issuedAt || null,
   };
 }

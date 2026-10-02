@@ -28,7 +28,7 @@ export const CITIZEN_TOPICS = [
       },
       {
         text: {
-          en: 'Apply for certificates (dakhala) such as Residence, Birth and Death, and download them once approved.',
+          en: 'Apply for certificates (dakhala) such as Marriage, Birth and Death, and download them once approved.',
           mr: 'रहिवासी, जन्म, मृत्यू असे दाखले मागवा आणि मंजूर झाल्यावर डाउनलोड करा.',
         },
       },
@@ -51,7 +51,7 @@ export const CITIZEN_TOPICS = [
         mr: 'खाते नसतानाही सूचना, योजना, कार्यक्रम व निर्देशिका पाहता येते. तक्रार, दाखले व कर यासाठी लॉगिन आवश्यक आहे.',
       },
     ],
-    related: ['register', 'login', 'file-complaint', 'apply-residence'],
+    related: ['register', 'login', 'file-complaint', 'apply-marriage'],
     route: '/',
     keywords: {
       en: ['start', 'begin', 'overview', 'services', 'what is this'],
@@ -528,7 +528,7 @@ export const CITIZEN_TOPICS = [
       },
     ],
     related: [
-      'apply-residence',
+      'apply-marriage',
       'apply-birth',
       'apply-death',
       'apply-other',
@@ -542,35 +542,39 @@ export const CITIZEN_TOPICS = [
     },
   },
   {
-    id: 'apply-residence',
+    id: 'apply-marriage',
     category: 'certificates',
     audience: 'citizen',
-    title: { en: 'Apply for a Residence certificate', mr: 'रहिवासी दाखल्यासाठी अर्ज करा' },
+    title: { en: 'Apply for a Marriage certificate', mr: 'विवाह दाखल्यासाठी अर्ज करा' },
     summary: {
-      en: 'Proof that you live in this village.',
-      mr: 'तुम्ही या गावात राहता याचा पुरावा.',
+      en: 'Record of a marriage held in this village.',
+      mr: 'या गावात झालेल्या विवाहाची नोंद.',
     },
     minutes: 10,
     requirements: [
       {
-        en: 'Identity proof — Aadhaar, PAN, Voter ID, Passport or Driving Licence',
-        mr: 'ओळखपत्र — आधार, पॅन, मतदार ओळखपत्र, पासपोर्ट किंवा वाहन परवाना',
+        en: 'Identity proof of the bride and groom — Aadhaar, PAN, Voter ID, Passport or Driving Licence',
+        mr: 'वधू व वराचा ओळखपुरावा — आधार, पॅन, मतदार ओळखपत्र, पासपोर्ट किंवा वाहन परवाना',
       },
       {
-        en: 'Address proof — Ration card, electricity bill, water bill or property tax receipt',
-        mr: 'पत्त्याचा पुरावा — शिधापत्रिका, वीज बिल, पाणी बिल किंवा घरपट्टी पावती',
+        en: 'Proof of marriage — the invitation card or a photograph of the ceremony',
+        mr: 'विवाहाचा पुरावा — विवाह पत्रिका किंवा समारंभाचा फोटो',
       },
       { en: 'A self-declaration', mr: 'स्वयंघोषणापत्र' },
+      {
+        en: 'Witness identity proof, if you have it (optional)',
+        mr: 'साक्षीदाराचा ओळखपुरावा, असल्यास (ऐच्छिक)',
+      },
     ],
     steps: [
       {
         text: { en: 'Open Certificates and tap "Apply".', mr: '"दाखले" उघडा आणि "अर्ज करा" दाबा.' },
       },
-      { text: { en: 'Choose "Residence".', mr: '"रहिवासी" निवडा.' } },
+      { text: { en: 'Choose "Marriage".', mr: '"विवाह" निवडा.' } },
       {
         text: {
-          en: 'Fill in your full name, mobile number and address.',
-          mr: 'पूर्ण नाव, मोबाइल क्रमांक व पत्ता भरा.',
+          en: "Fill in the groom's and bride's names, the date and place of the marriage, your mobile number and address.",
+          mr: 'वर व वधूची नावे, विवाहाची तारीख व ठिकाण, मोबाइल क्रमांक व पत्ता भरा.',
         },
       },
       {

@@ -452,7 +452,7 @@ paths:
               type: object
               properties:
                 certificateType:
-                  { type: string, enum: [Residence, Income, Birth, Death, Character, Other] }
+                  { type: string, enum: [Marriage, Birth, Death, SevenTwelve, Other] }
                 applicationData: { type: string, description: JSON string of type-specific fields }
                 documents: { type: array, items: { type: string, format: binary } }
               required: [certificateType, applicationData]

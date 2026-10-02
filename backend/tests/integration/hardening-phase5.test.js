@@ -262,7 +262,7 @@ describe('update validates the same fields as create', () => {
 describe('download centre', () => {
   async function publishedDoc(officerId, over = {}) {
     return DownloadDoc.create({
-      title: 'Residence certificate form',
+      title: 'Marriage certificate form',
       category: 'Form',
       fileUrl: 'https://example.test/form.pdf',
       fileName: 'form.pdf',

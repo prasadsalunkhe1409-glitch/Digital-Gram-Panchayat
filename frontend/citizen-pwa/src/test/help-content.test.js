@@ -88,7 +88,7 @@ describe('help knowledge base', () => {
   });
 
   it('covers a certificate guide for each certificate type', () => {
-    ['apply-residence', 'apply-birth', 'apply-death', 'apply-other'].forEach((id) => {
+    ['apply-marriage', 'apply-birth', 'apply-death', 'apply-other'].forEach((id) => {
       expect(getTopic(id)).toBeTruthy();
     });
   });

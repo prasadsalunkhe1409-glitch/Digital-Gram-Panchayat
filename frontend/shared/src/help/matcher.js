@@ -40,6 +40,10 @@ const SYNONYMS = {
   मृत्यू: ['death'],
   rahivasi: ['residence', 'रहिवासी'],
   रहिवासी: ['residence'],
+  vivah: ['marriage', 'विवाह'],
+  विवाह: ['marriage'],
+  lagna: ['marriage', 'विवाह'],
+  लग्न: ['marriage', 'विवाह'],
   // complaints
   takrar: ['complaint', 'तक्रार'],
   तक्रार: ['complaint'],

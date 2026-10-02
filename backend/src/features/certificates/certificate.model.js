@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { CERT_TYPES, DAKHALA_STATUSES } from '@dgp/shared';
+import { CERT_TYPES_ALL, DAKHALA_STATUSES } from '@dgp/shared';
 
 const { Schema, model } = mongoose;
 
@@ -31,7 +31,10 @@ const certificateSchema = new Schema(
   {
     applicationId: { type: String, required: true, unique: true },
     citizenId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    certificateType: { type: String, enum: CERT_TYPES, required: true, index: true },
+    // CERT_TYPES_ALL, not CERT_TYPES: the enum has to admit every type already stored.
+    // Residence is closed to new applications by the create validator, not by the schema —
+    // narrowing the schema would make existing Residence records fail to save.
+    certificateType: { type: String, enum: CERT_TYPES_ALL, required: true, index: true },
     applicationData: { type: Schema.Types.Mixed, default: {} },
     uploadedDocuments: { type: [documentSchema], default: [] },
     status: { type: String, enum: DAKHALA_STATUSES, default: 'Submitted', index: true },

@@ -481,7 +481,8 @@
       "Birth": "जन्म दाखला",
       "Death": "मृत्यू दाखला",
       "SevenTwelve": "७/१२ व ८अ उतारा",
-      "Other": "इतर दाखला"
+      "Other": "इतर दाखला",
+      "Marriage": "विवाह दाखला"
     },
     "status": {
       "Submitted": "सादर केले",
@@ -509,7 +510,11 @@
       "taluka": "तालुका",
       "district": "जिल्हा",
       "certificateTitle": "दाखल्याचे नाव",
-      "description": "तपशील"
+      "description": "तपशील",
+      "groomName": "वराचे पूर्ण नाव",
+      "brideName": "वधूचे पूर्ण नाव",
+      "marriageDate": "विवाहाची तारीख",
+      "marriagePlace": "विवाहाचे ठिकाण"
     },
     "dash": {
       "title": "दाखला अर्ज",
@@ -579,7 +584,10 @@
       "Existing712": "सध्याचा ७/१२",
       "Existing8A": "सध्याचा ८अ",
       "PropertyRecord": "मालमत्ता नोंद",
-      "Supporting": "पूरक कागदपत्र"
+      "Supporting": "पूरक कागदपत्र",
+      "MarriageInvitation": "विवाह पत्रिका",
+      "MarriagePhotograph": "विवाहाचा फोटो",
+      "WitnessIdentity": "साक्षीदाराचा ओळखपुरावा"
     },
     "docGroup": {
       "identity": "ओळखपत्र पुरावा",
@@ -593,7 +601,10 @@
       "addressProof": "पत्ता पुरावा",
       "applicantIdentity": "अर्जदाराचे ओळखपत्र",
       "landProof": "जमीन पुरावा",
-      "supporting": "पूरक कागदपत्रे"
+      "supporting": "पूरक कागदपत्रे",
+      "coupleIdentity": "वधू-वरांचा ओळखपुरावा",
+      "marriageProof": "विवाहाचा पुरावा",
+      "witnessIdentity": "साक्षीदाराचा ओळखपुरावा (ऐच्छिक)"
     }
   },
   "auth": {

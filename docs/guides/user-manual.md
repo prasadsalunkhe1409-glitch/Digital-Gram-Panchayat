@@ -34,7 +34,7 @@ one to see its timeline and officer remarks. You're notified when the status cha
 ## Apply for a certificate (Dakhala)
 
 1. **Certificates → Apply**.
-2. Choose a type (Residence, Income, Birth, Death, Character, Other).
+2. Choose a type (Marriage, Birth, Death, 7/12 & 8A, Other).
 3. Fill the required fields and attach supporting documents.
 4. Submit — track status (Submitted → Under Review → Approved/Rejected).
 5. When **Approved**, open the application and tap **Download certificate** (PDF).

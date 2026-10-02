@@ -194,7 +194,7 @@
  * @property {string} id
  * @property {string} applicationId  - human id, e.g. DKH-2026-000001
  * @property {string} citizenId
- * @property {'Residence'|'Income'|'Birth'|'Death'|'Character'|'Other'} certificateType
+ * @property {'Marriage'|'Birth'|'Death'|'SevenTwelve'|'Other'|'Residence'} certificateType
  * @property {Object.<string, any>} applicationData
  * @property {UploadedDocument[]} uploadedDocuments
  * @property {'Submitted'|'UnderReview'|'Approved'|'Rejected'} status
