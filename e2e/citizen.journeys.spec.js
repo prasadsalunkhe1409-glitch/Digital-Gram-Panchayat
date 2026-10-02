@@ -90,7 +90,11 @@ test('certificate application journey', async ({ page }) => {
   await page.goto('/dakhala/new');
 
   await page.getByLabel(/certificate type/i).selectOption('Marriage');
-  await page.getByLabel(/full name/i).fill('E2E Citizen');
+  // Marriage names both spouses, so /full name/i alone matches two fields.
+  await page.getByLabel(/groom.*full name/i).fill('E2E Groom');
+  await page.getByLabel(/bride.*full name/i).fill('E2E Bride');
+  await page.getByLabel(/date of marriage/i).fill('2026-02-14');
+  await page.getByLabel(/place of marriage/i).fill('Sakharale');
   await page.getByLabel(/mobile/i).fill(mobile);
   await page.getByLabel(/address/i).fill('Main Road, Sakharale');
 
