@@ -36,7 +36,8 @@
     "projects": "Works",
     "polls": "Polls",
     "documents": "Documents",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "timetable": "Timetable"
   },
   "ntf": {
     "title": "Notifications",
@@ -1017,5 +1018,50 @@
       },
       "loadError": "Could not load feedback"
     }
+  },
+  "timetable": {
+    "title": "Timetable",
+    "subtitle": "Ghantagadi and water supply schedules shown to citizens",
+    "new": "Add entry",
+    "edit": "Edit entry",
+    "empty": "No timetable entries yet.",
+    "loadError": "Could not load the timetable.",
+    "service": {
+      "Ghantagadi": "Ghantagadi (waste collection)",
+      "WaterSupply": "Water supply"
+    },
+    "day": {
+      "Daily": "Daily",
+      "Monday": "Monday",
+      "Tuesday": "Tuesday",
+      "Wednesday": "Wednesday",
+      "Thursday": "Thursday",
+      "Friday": "Friday",
+      "Saturday": "Saturday",
+      "Sunday": "Sunday"
+    },
+    "field": {
+      "serviceType": "Service",
+      "title": "Title (English)",
+      "titleMr": "Title (Marathi)",
+      "area": "Area / ward (English)",
+      "areaMr": "Area / ward (Marathi)",
+      "day": "Day",
+      "startTime": "Start time (24h, e.g. 07:30)",
+      "endTime": "End time (optional)",
+      "note": "Note (English)",
+      "noteMr": "Note (Marathi)",
+      "displayOrder": "Display order",
+      "isPublished": "Published"
+    },
+    "published": "Published",
+    "draft": "Draft",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "saved": "Timetable entry saved",
+    "deleted": "Timetable entry deleted",
+    "saveFailed": "Could not save the entry",
+    "deleteFailed": "Could not delete the entry",
+    "confirmDelete": "Delete this timetable entry?"
   }
 }

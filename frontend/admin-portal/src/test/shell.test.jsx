@@ -95,6 +95,8 @@ describe('MobileSidebar', () => {
       '/events',
       // Phase 4 governance modules — an officer on a phone must reach these too.
       '/meetings',
+      // The village service schedule, managed from the same drawer.
+      '/timetable',
       '/projects',
       '/polls',
       '/documents',

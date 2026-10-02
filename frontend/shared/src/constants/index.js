@@ -102,6 +102,33 @@ export const CERT_TYPES_LEGACY = ['Residence'];
 /** Every type that may appear on a stored record: use this for schemas, filters and labels. */
 export const CERT_TYPES_ALL = [...CERT_TYPES, ...CERT_TYPES_LEGACY];
 
+/**
+ * Village services that publish a recurring schedule.
+ *
+ * Two today. The list is here rather than inline in the model so the officer form, the citizen
+ * screen and the API validator all offer exactly the same set.
+ */
+export const TIMETABLE_SERVICES = ['Ghantagadi', 'WaterSupply'];
+
+/**
+ * Days a slot can fall on. 'Daily' is a real answer, not a convenience: many village water
+ * supplies run every day, and spelling that as seven identical rows would make the schedule
+ * harder to read and harder to keep correct.
+ */
+export const TIMETABLE_DAYS = [
+  'Daily',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+/** 24-hour wall clock, "HH:mm". Anchored, so "9:00" and "25:00" are both rejected. */
+export const TIME_HHMM_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 export const DAKHALA_STATUSES = ['Submitted', 'UnderReview', 'Approved', 'Rejected'];
 
 export const DAKHALA_STATUS_COLOR_MAP = {

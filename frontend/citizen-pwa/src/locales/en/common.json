@@ -851,5 +851,25 @@
       "DevelopmentReport": "Development reports",
       "Other": "Other"
     }
+  },
+  "timetable": {
+    "title": "Timetable",
+    "subtitle": "When village services run",
+    "empty": "The Gram Panchayat has not published this schedule yet.",
+    "loadError": "Could not load the timetable.",
+    "service": {
+      "Ghantagadi": "Ghantagadi (waste collection)",
+      "WaterSupply": "Water supply"
+    },
+    "day": {
+      "Daily": "Daily",
+      "Monday": "Monday",
+      "Tuesday": "Tuesday",
+      "Wednesday": "Wednesday",
+      "Thursday": "Thursday",
+      "Friday": "Friday",
+      "Saturday": "Saturday",
+      "Sunday": "Sunday"
+    }
   }
 }

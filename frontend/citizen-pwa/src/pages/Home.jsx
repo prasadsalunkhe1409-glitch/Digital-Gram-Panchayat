@@ -27,6 +27,7 @@ import { useSchemes } from '@/features/schemes/hooks';
 import { useVillageProfile, useVillageEvents } from '@/features/village/hooks';
 import { sortMembers } from '@/features/village/members';
 import { OfficialCard } from '@/features/village/OfficialCard';
+import { TimetableSection } from '@/features/timetable/TimetableSection';
 import { NoticeCard } from '@/features/notices/components/NoticeCard';
 import { SchemeCard } from '@/features/schemes/components/SchemeCard';
 import { useUnreadCount } from '@/features/notifications/hooks';
@@ -178,7 +179,12 @@ export function Home() {
         </div>
       </section>
 
-      {/* 5 — who runs the village */}
+      {/* 5 — when the village services run. Placed above the officials band because a
+          collection time is the thing a citizen checks weekly; a member's number is the thing
+          they look up once. */}
+      <TimetableSection />
+
+      {/* 6 — who runs the village */}
       <section aria-labelledby="officials-h">
         <SectionHeader
           id="officials-h"
@@ -216,7 +222,7 @@ export function Home() {
         )}
       </section>
 
-      {/* 6 — the village in numbers */}
+      {/* 7 — the village in numbers */}
       <VillageStats statistics={profile?.statistics} />
 
       {/* 7 + 8 — notices and schemes, side by side on desktop */}
@@ -270,7 +276,7 @@ export function Home() {
         </section>
       </div>
 
-      {/* 9 — emergency */}
+      {/* 8 — emergency */}
       <EmergencyContacts contacts={contacts} />
     </div>
   );

@@ -21,6 +21,7 @@ import { adminAuditRouter } from './features/audit/audit.routes.js';
 import { villageRouter, adminVillageRouter } from './features/village/village.routes.js';
 import { eventRouter, adminEventRouter } from './features/events/event.routes.js';
 import { meetingRouter, adminMeetingRouter } from './features/meetings/meeting.routes.js';
+import { timetableRouter, adminTimetableRouter } from './features/timetable/timetable.routes.js';
 import { projectRouter, adminProjectRouter } from './features/projects/project.routes.js';
 import { pollRouter, adminPollRouter } from './features/polls/poll.routes.js';
 import { feedbackRouter, adminFeedbackRouter } from './features/feedback/feedback.routes.js';
@@ -91,6 +92,8 @@ export function createApp() {
   apiRouter.use('/admin/events', adminEventRouter);
   apiRouter.use('/meetings', meetingRouter);
   apiRouter.use('/admin/meetings', adminMeetingRouter);
+  apiRouter.use('/timetable', timetableRouter);
+  apiRouter.use('/admin/timetable', adminTimetableRouter);
   apiRouter.use('/projects', projectRouter);
   apiRouter.use('/admin/projects', adminProjectRouter);
   apiRouter.use('/polls', pollRouter);

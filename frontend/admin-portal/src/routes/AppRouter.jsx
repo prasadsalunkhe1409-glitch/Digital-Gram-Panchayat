@@ -60,6 +60,10 @@ const MeetingsAdmin = lazyNamed(
   () => import('@/features/governance/MeetingsAdmin'),
   'MeetingsAdmin',
 );
+const TimetableAdmin = lazyNamed(
+  () => import('@/features/timetable/TimetableAdmin'),
+  'TimetableAdmin',
+);
 const ProjectsAdmin = lazyNamed(
   () => import('@/features/governance/ProjectsAdmin'),
   'ProjectsAdmin',
@@ -111,6 +115,7 @@ const router = createBrowserRouter([
           { path: 'village', element: page(<VillageProfilePage />) },
           { path: 'events', element: page(<EventsPage />) },
           { path: 'meetings', element: page(<MeetingsAdmin />) },
+          { path: 'timetable', element: page(<TimetableAdmin />) },
           { path: 'projects', element: page(<ProjectsAdmin />) },
           { path: 'polls', element: page(<PollsAdmin />) },
           { path: 'documents', element: page(<DocumentsAdmin />) },
