@@ -273,7 +273,7 @@ export function GlobalSearch({
         }}
         onFocus={() => setOpen(true)}
         placeholder={t('search.placeholder')}
-        className="h-12 w-full rounded-xl border border-border bg-card pl-11 pr-11 text-body text-foreground shadow-xs outline-none transition-shadow duration-150 placeholder:text-muted-foreground focus-visible:shadow-sm"
+        className="h-12 w-full rounded-xl border border-input bg-card pl-11 pr-11 text-body text-foreground shadow-xs outline-none transition-shadow duration-150 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:shadow-sm focus-visible:ring-2 focus-visible:ring-ring/40"
       />
       {query ? (
         <button

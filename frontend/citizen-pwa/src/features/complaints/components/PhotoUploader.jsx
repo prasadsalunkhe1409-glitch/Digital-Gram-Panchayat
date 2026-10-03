@@ -50,7 +50,7 @@ export function PhotoUploader({ files, onChange }) {
   return (
     <div className="space-y-2">
       {/* A heading, not a <label> — the file inputs are hidden and driven by their own buttons. */}
-      <p className="block text-sm font-medium text-foreground">
+      <p className="block text-label text-foreground">
         {t('complaint.form.photos')} ({files.length}/{MAX_COMPLAINT_PHOTOS})
       </p>
 
@@ -98,7 +98,7 @@ export function PhotoUploader({ files, onChange }) {
           type="button"
           disabled={atMax}
           onClick={() => cameraRef.current?.click()}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-input bg-card px-3 py-2 text-label text-foreground min-h-11 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Camera className="h-4 w-4" />
           {t('complaint.form.capturePhoto')}
@@ -107,7 +107,7 @@ export function PhotoUploader({ files, onChange }) {
           type="button"
           disabled={atMax}
           onClick={() => galleryRef.current?.click()}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-input bg-card px-3 py-2 text-label text-foreground min-h-11 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ImageUp className="h-4 w-4" />
           {t('complaint.form.uploadPhoto')}

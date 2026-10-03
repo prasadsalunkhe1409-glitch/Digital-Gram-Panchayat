@@ -9,7 +9,13 @@ const { Schema, model } = mongoose;
 const auditLogSchema = new Schema(
   {
     actorId: { type: Schema.Types.ObjectId, ref: 'User' },
-    actorRole: { type: String, enum: ['citizen', 'officer', 'system'], required: true },
+    actorRole: {
+      type: String,
+      // root_admin joins the existing three. Without it `writeAudit` fails validation and the
+      // error is swallowed by design, so a privileged action would go unrecorded.
+      enum: ['citizen', 'officer', 'root_admin', 'system'],
+      required: true,
+    },
     action: { type: String, required: true }, // e.g. complaint.create, complaint.status.update
     entity: { type: String, required: true }, // collection name
     entityId: { type: Schema.Types.ObjectId },

@@ -16,7 +16,7 @@ import {
   certificateVerifyRouter,
 } from './features/certificates/certificate.routes.js';
 import { adminDashboardRouter } from './features/dashboard/dashboard.routes.js';
-import { adminUserRouter } from './features/users/user.routes.js';
+import { adminUserRouter, rootAdminRouter } from './features/users/user.routes.js';
 import { adminAuditRouter } from './features/audit/audit.routes.js';
 import { villageRouter, adminVillageRouter } from './features/village/village.routes.js';
 import { eventRouter, adminEventRouter } from './features/events/event.routes.js';
@@ -85,6 +85,7 @@ export function createApp() {
   apiRouter.use('/certificates', certificateVerifyRouter);
   apiRouter.use('/admin/dashboard', adminDashboardRouter);
   apiRouter.use('/admin/users', adminUserRouter);
+  apiRouter.use('/admin/admins', rootAdminRouter);
   apiRouter.use('/admin/audit', adminAuditRouter);
   apiRouter.use('/village', villageRouter);
   apiRouter.use('/admin/village', adminVillageRouter);

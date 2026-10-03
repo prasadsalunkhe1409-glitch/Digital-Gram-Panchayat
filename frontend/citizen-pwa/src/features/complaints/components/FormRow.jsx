@@ -10,17 +10,17 @@ export function FormRow({ label, error, optional, children }) {
        * New Complaint form was announced by a screen reader with no name (WCAG 1.3.1 / 4.1.2).
        */}
       <label className="block space-y-1">
-        <span className="block text-sm font-medium text-foreground">
+        <span className="block text-label text-foreground">
           {label}
           {optional ? (
-            <span className="ml-1 text-xs font-normal text-muted-foreground">
+            <span className="ml-1 text-caption font-normal text-muted-foreground">
               ({t('complaint.form.optional')})
             </span>
           ) : null}
         </span>
         {children}
       </label>
-      {error ? <p className="text-xs text-destructive">{error.message}</p> : null}
+      {error ? <p className="text-caption text-destructive-strong">{error.message}</p> : null}
     </div>
   );
 }

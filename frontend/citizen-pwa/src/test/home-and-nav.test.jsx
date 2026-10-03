@@ -238,7 +238,10 @@ describe('back navigation reaches every module screen', () => {
   });
 
   it('gives the login page a way back to the public village page', () => {
-    expect(read('features/auth/pages/Login.jsx')).toContain('<BackButton to="/welcome"');
+    const src = read('features/auth/pages/Login.jsx');
+    // Attribute may sit on its own line, so match the component and its target separately.
+    expect(src).toContain('<BackButton');
+    expect(src).toContain('to="/welcome"');
   });
 });
 
@@ -263,7 +266,16 @@ describe('the button system', () => {
     const login = read('features/auth/components/LoginForm.jsx');
     // The class, not the word — the comment above it names the colour it replaced.
     expect(login).not.toMatch(/className=\{?[^}]*bg-info/);
-    expect(login).toContain("variant={officer ? 'default' : 'secondary'}");
+    // Both tabs sign in with the palette's action blue, through the shared variant.
+    expect(login).toContain('variant="action"');
+  });
+
+  it('defines the action variant on the interactive token, not a literal hex', () => {
+    const src = read('components/ui/button.jsx');
+    const variant = src.slice(src.indexOf('action:'), src.indexOf('action:') + 120);
+    expect(variant).toContain('bg-interactive text-interactive-foreground');
+    // The colour comes from the token; the hex appears only in the comment explaining it.
+    expect(variant).not.toMatch(/#[0-9a-f]{6}/i);
   });
 });
 

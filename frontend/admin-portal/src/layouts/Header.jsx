@@ -33,12 +33,12 @@ export function Header({ onOpenNav }) {
   const { pathname } = useLocation();
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-border bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80 md:px-6">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-primary-hover bg-primary px-4 text-primary-foreground md:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="md:hidden text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
           onClick={onOpenNav}
           aria-label={t('nav.openMenu')}
         >
@@ -51,12 +51,12 @@ export function Header({ onOpenNav }) {
          * two competing top-level headings. The page's own <h1> is now the only one.
          */}
         <nav aria-label={t('nav.breadcrumb')} className="min-w-0">
-          <ol className="flex min-w-0 items-center gap-1.5 text-caption text-muted-foreground">
+          <ol className="flex min-w-0 items-center gap-1.5 text-caption text-primary-foreground/75">
             <li className="hidden shrink-0 sm:block">{t('nav.portalLabel')}</li>
             <li aria-hidden="true" className="hidden shrink-0 sm:block">
               /
             </li>
-            <li className="truncate text-label font-medium text-foreground">
+            <li className="truncate text-label font-medium text-primary-foreground">
               {t(sectionKey(pathname))}
             </li>
           </ol>
@@ -67,6 +67,7 @@ export function Header({ onOpenNav }) {
         <Button
           variant="ghost"
           size="sm"
+          className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
           onClick={() => setLanguage(language === 'en' ? 'mr' : 'en')}
           aria-label={t('nav.toggleLanguage')}
         >

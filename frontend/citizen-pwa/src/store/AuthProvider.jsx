@@ -111,8 +111,12 @@ export function AuthProvider({ children }) {
       // Store an already-authenticated session (shared login page authenticates first,
       // then decides whether this app keeps the session or hands it to the admin portal).
       adoptSession: persistSession,
+      // Drop whatever this app is holding, without calling the logout endpoint. The shared
+      // login page uses it when an authenticated account turns out to belong to the other
+      // portal: nothing of theirs should be left behind in this one.
+      discardSession: clearSession,
     }),
-    [user, token, ready, login, register, logout, updateProfile, persistSession],
+    [user, token, ready, login, register, logout, updateProfile, persistSession, clearSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

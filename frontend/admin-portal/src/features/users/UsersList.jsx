@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { FilterBar, SearchInput } from '@/components/FilterBar';
 import { WardFilter } from '@/components/WardFilter';
 import { WardCell } from './WardCell';
+import { AdminAccounts } from './AdminAccounts';
 import { Pagination } from '@/components/Pagination';
 import {
   TableShell,
@@ -143,6 +144,8 @@ export function UsersList() {
         onPage={setPage}
         totalLabel={t('users.total', { total })}
       />
+      {/* Root-admin only; renders nothing for an ordinary officer. */}
+      <AdminAccounts />
     </div>
   );
 }

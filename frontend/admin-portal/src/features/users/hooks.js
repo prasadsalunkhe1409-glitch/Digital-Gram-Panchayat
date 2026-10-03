@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { userService } from './userService';
+import { userService, adminAccountService } from './userService';
 
 export const userKeys = {
   list: (params) => ['admin-users', 'list', params ?? {}],
@@ -42,4 +42,35 @@ export function useSetUserStatus(id) {
       qc.invalidateQueries({ queryKey: ['admin-users', 'list'] });
     },
   });
+}
+
+/* ------------------------------------------------------- root admin: officer accounts */
+
+const adminAccountKeys = { all: ['admin-accounts'] };
+
+export function useAdminAccounts(enabled = true) {
+  return useQuery({
+    queryKey: adminAccountKeys.all,
+    queryFn: () => adminAccountService.list(),
+    enabled,
+  });
+}
+
+export function useAdminAccountMutations() {
+  const qc = useQueryClient();
+  const invalidate = () => qc.invalidateQueries({ queryKey: adminAccountKeys.all });
+  return {
+    create: useMutation({
+      mutationFn: (values) => adminAccountService.create(values),
+      onSuccess: invalidate,
+    }),
+    setStatus: useMutation({
+      mutationFn: ({ id, status }) => adminAccountService.setStatus(id, status),
+      onSuccess: invalidate,
+    }),
+    remove: useMutation({
+      mutationFn: (id) => adminAccountService.remove(id),
+      onSuccess: invalidate,
+    }),
+  };
 }

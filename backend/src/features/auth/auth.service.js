@@ -1,4 +1,4 @@
-import { ROLES } from '@dgp/shared';
+import { ROLES, ADMIN_ROLES } from '@dgp/shared';
 import { User } from './user.model.js';
 import { hashPassword, comparePassword } from '../../utils/password.js';
 import { signToken } from '../../utils/jwt.js';
@@ -59,7 +59,9 @@ export async function loginCitizen({ mobile, password }) {
  */
 export async function loginUnified({ identifier, password }) {
   const id = String(identifier || '').trim();
-  const query = /^[6-9]\d{9}$/.test(id) ? { mobile: id } : { email: id.toLowerCase() };
+  // Exact match on the identifier. Lowercasing here would re-introduce the behaviour where
+  // any capitalisation of a registered email authenticates as that account.
+  const query = /^[6-9]\d{9}$/.test(id) ? { mobile: id } : { email: id };
   const user = await User.findOne(query).select('+passwordHash');
   await assertActiveCredentials(user, password);
 
@@ -72,12 +74,19 @@ export async function loginUnified({ identifier, password }) {
 
 /**
  * Log an officer (admin portal) in with email + password.
+ *
+ * A root admin signs in through this same door — it is an officer account with one extra
+ * privilege, not a second authentication system. `assertActiveCredentials` still applies, so
+ * a deactivated account of either role is refused here exactly as before.
+ *
  * @param {{ email: string, password: string }} input
  */
 export async function loginOfficer({ email, password }) {
-  const user = await User.findOne({ email: email.toLowerCase(), role: ROLES.OFFICER }).select(
-    '+passwordHash',
-  );
+  const user = await User.findOne({
+    // Exact match — see loginUnified.
+    email,
+    role: { $in: ADMIN_ROLES },
+  }).select('+passwordHash');
   await assertActiveCredentials(user, password);
 
   user.lastLogin = new Date();

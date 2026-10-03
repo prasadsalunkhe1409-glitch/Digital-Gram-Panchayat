@@ -40,7 +40,7 @@
        an ordinary table control, where it would read as a warning. */
     --accent-gold: 42 98% 57%; /* #FDBD26 */
     --accent-gold-hover: 38 95% 50%; /* darker #FDBD26 */
-    --accent-gold-foreground: 222 47% 11%; /* #0F172A */
+    --accent-gold-foreground: 224 64% 33%; /* #1E3B8B — dark blue on gold, 6.1:1 */
 
 
     /* Neutrals — #334155 slate, #F1F5F9 surface-secondary, #475569/#64748B text. */
@@ -103,6 +103,17 @@
     --input: 214 22% 53%; /* #6D84A2 */
     --ring: 219 79% 56%; /* #3774E7 — the palette's interactive blue */
     --radius: 0.625rem; /* 10px — sm 6, md 8, lg 10, xl 14 */
+
+    /*
+     * Height of the fixed citizen bottom bar, excluding the device's safe-area inset.
+     * 61px tap row + 1px top border.
+     *
+     * Three things need this number and none of them can see the bar: the page's bottom
+     * padding, which keeps content from ending underneath it, and the floating help button,
+     * which sits above it. They each used to carry their own copy, which is how the help
+     * button came to overlap the bar by 38px from 640px up while looking correct on a phone.
+     */
+    --citizen-bottom-nav-height: 3.875rem;
   }
   * {
     @apply border-border;

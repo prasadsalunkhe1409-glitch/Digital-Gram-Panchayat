@@ -12,7 +12,7 @@ const userSchema = new Schema(
   {
     role: {
       type: String,
-      enum: [ROLES.CITIZEN, ROLES.OFFICER],
+      enum: [ROLES.CITIZEN, ROLES.OFFICER, ROLES.ROOT_ADMIN],
       required: true,
       index: true,
     },
@@ -28,10 +28,18 @@ const userSchema = new Schema(
       sparse: true,
       match: /^[6-9]\d{9}$/,
     },
+    /*
+     * Stored exactly as it was entered.
+     *
+     * The field used to lowercase on write, which made `Admin@dgp.local` and
+     * `admin@dgp.local` the same account. The unique index has no collation, so it is already
+     * case-sensitive at the database level — dropping the setter is all that is needed for
+     * two capitalisations to be two identities, and for a login to have to match the one that
+     * was registered.
+     */
     email: {
       type: String,
       trim: true,
-      lowercase: true,
       unique: true,
       sparse: true,
     },

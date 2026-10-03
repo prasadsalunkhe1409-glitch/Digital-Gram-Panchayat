@@ -389,7 +389,17 @@ export const MAX_COMPLAINT_PHOTOS = 3;
 export const ROLES = {
   CITIZEN: 'citizen',
   OFFICER: 'officer',
+  /**
+   * The one account that may add and remove officers. It is never self-registered and never
+   * created through the portal — only the seeding script assigns it. Everywhere else in the
+   * system a root admin is an officer: `authorize(ROLES.OFFICER)` admits it, so the whole
+   * existing officer surface keeps working without 20 route changes.
+   */
+  ROOT_ADMIN: 'root_admin',
 };
+
+/** Roles that sign in through the officer portal. */
+export const ADMIN_ROLES = [ROLES.OFFICER, ROLES.ROOT_ADMIN];
 
 export const TOKEN_STORAGE_KEY = 'dgp_token';
 export const USER_STORAGE_KEY = 'dgp_user';

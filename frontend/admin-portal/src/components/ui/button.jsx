@@ -29,6 +29,15 @@ const buttonVariants = cva(
           'bg-interactive-strong text-interactive-foreground shadow-xs hover:bg-interactive-strong/90',
         // Gold carries dark ink, never white: ink measures 10.6:1 on it, white 1.7:1.
         accent: 'bg-gold text-gold-foreground shadow-xs hover:bg-gold-hover',
+        /*
+         * The palette's interactive blue at its own value, for the sign-in action.
+         *
+         * White on #3774E7 measures 4.36:1 — a shade under the 4.5:1 WCAG AA asks of normal
+         * text, and no foreground clears it on that blue (near-black is 4.09:1). The colour
+         * is the design decision; the hover darkens to `interactive-strong`, which does pass
+         * at 6.17:1. Use `secondary` where the darker value is wanted throughout.
+         */
+        action: 'bg-interactive text-interactive-foreground shadow-xs hover:bg-interactive-strong',
         // The old neutral fill, kept for the quiet actions that used `secondary` as a wash.
         muted: 'bg-secondary text-secondary-foreground hover:bg-secondary/70',
         destructive: 'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90',

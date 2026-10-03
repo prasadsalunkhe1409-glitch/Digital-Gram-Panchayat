@@ -11,6 +11,14 @@ const items = [
   { to: '/profile', label: 'nav.profile', icon: User },
 ];
 
+/**
+ * The citizen's primary navigation.
+ *
+ * Navy to match the header, so the two bands frame the page as one official surface. The
+ * selected destination is a gold pill carrying a navy icon — gold appears nowhere else in
+ * this bar, which is what makes "you are here" readable at a glance and at arm's length.
+ * Routes, order and behaviour are untouched.
+ */
 export function BottomNav() {
   const { t } = useTranslation();
 
@@ -18,7 +26,9 @@ export function BottomNav() {
     <nav
       aria-label={t('nav.home')}
       // pb-safe keeps the bar clear of the iOS/Android home indicator when installed.
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur supports-[backdrop-filter]:bg-card/80"
+      // min-h pins the bar to the token the page padding and the help button measure from,
+      // so the three cannot drift apart.
+      className="fixed inset-x-0 bottom-0 z-20 min-h-[calc(var(--citizen-bottom-nav-height)+env(safe-area-inset-bottom))] border-t border-white/10 bg-primary pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_3px_rgba(15,23,41,0.18)]"
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-between px-1">
         {items.map(({ to, label, icon: Icon, end }) => (
@@ -32,9 +42,11 @@ export function BottomNav() {
               className={({ isActive }) =>
                 cn(
                   'group flex min-h-[56px] flex-col items-center justify-center gap-1 py-1.5',
-                  'text-caption font-medium text-muted-foreground transition-colors duration-150',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
-                  isActive && 'text-primary',
+                  'text-[0.6875rem] font-medium tracking-tight transition-colors duration-150',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white',
+                  isActive
+                    ? 'text-gold'
+                    : 'text-primary-foreground/85 hover:text-primary-foreground',
                 )
               }
             >
@@ -44,7 +56,7 @@ export function BottomNav() {
                   <span
                     className={cn(
                       'flex h-7 w-full max-w-14 items-center justify-center rounded-full transition-colors duration-150',
-                      isActive ? 'bg-primary-subtle' : 'group-hover:bg-accent',
+                      isActive ? 'bg-gold text-gold-foreground' : 'group-hover:bg-white/15',
                     )}
                   >
                     <Icon className="h-5 w-5" aria-hidden="true" />

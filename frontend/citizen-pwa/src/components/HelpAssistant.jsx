@@ -78,7 +78,19 @@ export function HelpAssistant() {
         aria-label={t('assistant.open')}
         title={t('assistant.open')}
         // Sits above the bottom navigation on mobile so it never covers a nav item.
-        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform duration-150 hover:bg-primary-hover active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:bottom-6"
+        /*
+         * Always one gap above the bottom bar, at every width. `sm:bottom-6` used to drop it
+         * to 24px from 640px up, which put it 38px *inside* a bar that is fixed at every
+         * breakpoint — correct on a phone, overlapping on a tablet and a desktop.
+         *
+         * z-10 rather than z-30: above the page it floats over, below the bar it sits above.
+         * The panel this opens keeps its own z-40 and is unaffected.
+         *
+         * Warm paper with a navy mark, so it reads as a utility resting on the page instead
+         * of a piece of the navy bar that has come loose. Gold is not used here — that is the
+         * selected-tab colour one row below.
+         */
+        className="fixed bottom-[calc(var(--citizen-bottom-nav-height)+1rem+env(safe-area-inset-bottom))] right-4 z-10 flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-card text-primary shadow-lg transition-transform duration-150 hover:bg-primary-subtle active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <MessageCircleQuestion className="h-6 w-6" aria-hidden="true" />
       </button>

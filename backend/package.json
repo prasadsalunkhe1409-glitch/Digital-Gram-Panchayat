@@ -10,10 +10,11 @@
   "scripts": {
     "dev": "nodemon",
     "start": "node src/server.js",
-    "build": "echo \"backend is plain ES-module JS — no build step\" && exit 0",
+    "build": "echo \"backend is plain ES-module JS \u2014 no build step\" && exit 0",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "test:coverage": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
     "seed:admin": "node scripts/seed-admin.js",
+    "promote:root-admin": "node scripts/promote-root-admin.js",
     "seed:village": "node scripts/seed-village.js",
     "db:indexes": "node scripts/sync-indexes.js",
     "clean": "echo \"nothing to clean\" && exit 0"

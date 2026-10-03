@@ -12,7 +12,7 @@ export function GpsCapture({ coords, status, address, onRequest }) {
   return (
     <div className="space-y-2">
       {/* A heading, not a <label> — this block heads a button, not a form control. */}
-      <p className="block text-sm font-medium text-foreground">{t('complaint.form.location')}</p>
+      <p className="block text-label text-foreground">{t('complaint.form.location')}</p>
 
       <Button type="button" variant="outline" onClick={onRequest} disabled={status === 'loading'}>
         {status === 'loading' ? (
@@ -28,7 +28,7 @@ export function GpsCapture({ coords, status, address, onRequest }) {
       </Button>
 
       {coords ? (
-        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+        <p className="flex items-center gap-1 text-caption text-muted-foreground">
           <MapPin className="h-3.5 w-3.5 text-primary" />
           {t('complaint.form.gpsCoords', {
             lat: coords.latitude.toFixed(5),
@@ -38,21 +38,25 @@ export function GpsCapture({ coords, status, address, onRequest }) {
         </p>
       ) : null}
 
-      {coords && address ? <p className="text-xs text-muted-foreground">{address}</p> : null}
+      {coords && address ? <p className="text-caption text-muted-foreground">{address}</p> : null}
 
       {!coords && status === 'loading' ? (
-        <p className="text-xs text-muted-foreground">{t('complaint.form.gpsFetching')}</p>
+        <p className="text-caption text-muted-foreground">{t('complaint.form.gpsFetching')}</p>
       ) : !coords && status !== 'idle' ? (
         <div className="space-y-1">
-          <p className="text-xs text-destructive">{t(`complaint.form.gps_${status}`)}</p>
+          <p className="text-caption text-destructive-strong">
+            {t(`complaint.form.gps_${status}`)}
+          </p>
           <button
             type="button"
             onClick={onRequest}
-            className="text-xs font-medium text-primary underline-offset-2 hover:underline"
+            className="inline-flex min-h-11 items-center text-caption font-medium text-interactive-strong underline-offset-2 hover:underline"
           >
             {t('complaint.form.gpsRetry')}
           </button>
-          <p className="text-xs text-muted-foreground">{t('complaint.form.locationUnavailable')}</p>
+          <p className="text-caption text-muted-foreground">
+            {t('complaint.form.locationUnavailable')}
+          </p>
         </div>
       ) : null}
     </div>

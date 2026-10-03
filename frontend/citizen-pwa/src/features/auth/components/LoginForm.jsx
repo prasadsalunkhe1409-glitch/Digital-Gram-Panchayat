@@ -1,9 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, User, Landmark } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { VALIDATION, ROLES } from '@dgp/shared';
+import { VALIDATION, ADMIN_ROLES } from '@dgp/shared';
+import { cn } from '@/utils/cn';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/features/auth/authService';
@@ -22,7 +23,7 @@ const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:5174';
  */
 export function LoginForm({ mode = 'villager' }) {
   const { t } = useTranslation();
-  const { adoptSession } = useAuth();
+  const { adoptSession, discardSession } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/';
@@ -38,21 +39,31 @@ export function LoginForm({ mode = 'villager' }) {
   const onSubmit = async (values) => {
     try {
       const { user, token } = await authService.loginSession(values);
-      const isOfficerAccount = user.role === ROLES.OFFICER;
+      // Every administrative role, not just `officer`. A root admin is an officer account
+      // with one extra privilege, and testing for `officer` alone classified it as a citizen:
+      // the Officer tab then refused it as "belongs to the Villager Portal", while the
+      // Villager tab silently started a citizen session for an administrator.
+      const isAdminAccount = ADMIN_ROLES.includes(user.role);
 
       // The tab must match the account's role. On a mismatch the issued token is simply
       // discarded — nothing is stored, no session starts, the user is told which door
       // to use. (Same endpoint either way; this is a UI gate, not an auth change.)
-      if (isOfficerAccount && !officer) {
+      //
+      // Anything this app was already holding is dropped too. A mismatch means the person at
+      // the keyboard is not a citizen of this session, and a half-finished attempt must never
+      // leave credentials behind for the next one.
+      if (isAdminAccount && !officer) {
+        discardSession();
         toast.error(t('auth.wrongTabOfficer'));
         return;
       }
-      if (!isOfficerAccount && officer) {
+      if (!isAdminAccount && officer) {
+        discardSession();
         toast.error(t('auth.wrongTabVillager'));
         return;
       }
 
-      if (isOfficerAccount) {
+      if (isAdminAccount) {
         // Officer: this app never stores the session — hand it to the admin portal.
         window.location.replace(`${ADMIN_URL}/auth/callback#token=${encodeURIComponent(token)}`);
         return;
@@ -70,15 +81,34 @@ export function LoginForm({ mode = 'villager' }) {
   const forgotPassword = () => toast(t('auth.forgotHint'));
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3" noValidate>
       {/* Mode heading — keyed so it remounts and fades on tab switch. */}
-      <div key={mode} className="animate-in fade-in duration-200">
-        <h2 className="text-section text-foreground">
-          {officer ? t('auth.officerLoginTitle') : t('auth.citizenLoginTitle')}
-        </h2>
-        <p className="mt-1 text-caption text-muted-foreground">
-          {officer ? t('auth.officerLoginDesc') : t('auth.citizenLoginDesc')}
-        </p>
+      <div key={mode} className="flex animate-in items-center gap-3 duration-200 fade-in">
+        {/* Mode illustration — Lucide only, in the mode's accent. */}
+        <span
+          className={cn(
+            'flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
+            // Both wells are the palette's pale blue; the icon inside carries the
+            // distinction — navy for the officer door, interactive blue for the villager.
+            officer
+              ? 'bg-primary-subtle text-primary'
+              : 'bg-primary-subtle text-interactive-strong',
+          )}
+        >
+          {officer ? (
+            <Landmark className="h-6 w-6" aria-hidden="true" />
+          ) : (
+            <User className="h-6 w-6" aria-hidden="true" />
+          )}
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-section text-foreground">
+            {officer ? t('auth.officerLoginTitle') : t('auth.citizenLoginTitle')}
+          </h2>
+          <p className="mt-0.5 text-caption text-muted-foreground">
+            {officer ? t('auth.officerLoginDesc') : t('auth.citizenLoginDesc')}
+          </p>
+        </div>
       </div>
 
       <FormField
@@ -114,16 +144,10 @@ export function LoginForm({ mode = 'villager' }) {
       </div>
 
       {/*
-        Villager carries the palette's interactive blue, officer the brand navy — the same two
-        values the button system already defines, rather than a colour mixed in at the call
-        site. `bg-info` was doing this job before and sat outside the palette entirely.
+        Both tabs sign in with the palette's action blue — the same button variant either way,
+        rather than a colour mixed in at the call site.
       */}
-      <Button
-        type="submit"
-        variant={officer ? 'default' : 'secondary'}
-        className="w-full"
-        loading={isSubmitting}
-      >
+      <Button type="submit" variant="action" className="w-full" loading={isSubmitting}>
         {t('auth.login')}
       </Button>
 

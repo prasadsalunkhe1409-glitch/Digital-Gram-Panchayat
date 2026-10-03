@@ -27,29 +27,41 @@ export function Login() {
 
   if (isAuthenticated) return <Navigate to="/" replace />;
 
-  const officer = mode === 'officer';
-
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[500px] flex-col justify-center px-4 py-10">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[460px] flex-col justify-center px-4 py-4 sm:py-5">
       {/*
         A way back to the public page. Someone who followed "Enter portal" and then decided
         they only wanted the office timings had no route back except the browser button, and
         on the installed PWA there is no browser button.
       */}
-      <BackButton to="/welcome" label={t('auth.backToWelcome')} className="self-start" />
+      {/*
+        A full-width navy bar rather than a bare text link: at the top of a signed-out page it
+        reads as the way out, and it lines up with the card below it instead of floating.
+      */}
+      <BackButton
+        to="/welcome"
+        label={t('auth.backToWelcome')}
+        className="mb-3 w-full justify-start rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary-hover hover:text-primary-foreground"
+      />
 
-      {/* Masthead */}
-      <div className="mb-6 flex flex-col items-center gap-2 text-center">
-        <img src={logo} alt="" width={64} height={64} />
-        <h1 className="text-title text-foreground">{t('appName')}</h1>
-        <p className="text-body text-muted-foreground">{t('auth.subtitle')}</p>
+      {/*
+        Masthead. Stacked on a phone, where width is the scarce dimension; a row from 640px up,
+        where height is. The row is what buys the page its fit on a 720px-tall laptop — the logo
+        sits beside the wordmark instead of stacking 136px of column above the card.
+      */}
+      <div className="mb-4 flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-3 sm:text-left">
+        <img src={logo} alt="" width={64} height={64} className="shrink-0" />
+        <div className="min-w-0">
+          <h1 className="text-title text-foreground">{t('appName')}</h1>
+          <p className="text-body text-muted-foreground">{t('auth.subtitle')}</p>
+        </div>
       </div>
 
       {/* Segmented mode selector — UI only, no navigation, no extra API. */}
       <div
         role="tablist"
         aria-label={t('auth.login')}
-        className="mb-4 grid grid-cols-2 gap-1 rounded-lg border border-border bg-secondary p-1"
+        className="mb-3 grid grid-cols-2 gap-1 rounded-lg border border-border bg-secondary p-1"
       >
         {TABS.map(({ key, icon: Icon, labelKey }) => {
           const active = mode === key;
@@ -81,31 +93,13 @@ export function Login() {
         role="tabpanel"
         id="login-panel"
         aria-labelledby={`login-tab-${mode}`}
-        className="rounded-lg border border-border bg-card p-6 shadow-sm sm:p-8"
+        className="rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6"
       >
-        {/* Mode illustration — Lucide only, in the mode's accent. */}
-        <div
-          key={`illus-${mode}`}
-          className="mb-5 flex animate-in justify-center duration-200 fade-in"
-        >
-          <span
-            className={cn(
-              'flex h-16 w-16 items-center justify-center rounded-full',
-              // Both wells are the palette's pale blue; the icon inside carries the
-              // distinction — navy for the officer door, interactive blue for the villager.
-              officer
-                ? 'bg-primary-subtle text-primary'
-                : 'bg-primary-subtle text-interactive-strong',
-            )}
-          >
-            {officer ? (
-              <Landmark className="h-8 w-8" aria-hidden="true" />
-            ) : (
-              <User className="h-8 w-8" aria-hidden="true" />
-            )}
-          </span>
-        </div>
-
+        {/*
+          The mode illustration moved inside the form's heading block, which renders it beside
+          the heading rather than as its own centred row. It cost 84px of column there and
+          costs nothing here, because the heading is already taller than the badge.
+        */}
         <LoginForm mode={mode} />
       </div>
     </div>

@@ -58,7 +58,7 @@ function Brand() {
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       <img src={logo} alt="" aria-hidden="true" className="h-8 w-8 shrink-0 rounded-md" />
-      <span className="truncate text-section text-foreground">{t('appName')}</span>
+      <span className="truncate text-section font-semibold text-primary">{t('appName')}</span>
     </span>
   );
 }
@@ -74,9 +74,13 @@ function NavItems() {
       className={({ isActive }) =>
         cn(
           // 44px min height keeps every row a comfortable touch target in the mobile drawer.
-          'group relative flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-body font-medium',
-          'text-muted-foreground transition-colors duration-150',
-          'hover:bg-accent hover:text-accent-foreground',
+          'group relative flex min-h-11 items-center gap-3 rounded-md pl-4 pr-3 py-2 text-body font-medium',
+          // Navy at rest rather than grey: a government navigation list should read as one
+          // family, and muted grey made every section look half-disabled next to the active
+          // one. Hover is the page colour, so the row lifts off the warm sidebar without
+          // introducing a third surface.
+          'text-primary transition-colors duration-150',
+          'hover:bg-background hover:text-primary',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
           isActive && 'bg-primary-subtle text-primary',
         )
@@ -84,12 +88,15 @@ function NavItems() {
     >
       {({ isActive }) => (
         <>
-          {/* 3px rail marks the section — quieter than a full-width fill. */}
+          {/*
+            The rail marks the section — quieter than a full-width fill, and in the action
+            blue so it reads as the one live thing in the list rather than more navy.
+          */}
           <span
             aria-hidden="true"
             className={cn(
-              'absolute inset-y-1.5 left-0 w-0.5 rounded-full transition-colors duration-150',
-              isActive ? 'bg-primary' : 'bg-transparent',
+              'absolute inset-y-1.5 left-0 w-1 rounded-full transition-colors duration-150',
+              isActive ? 'bg-interactive' : 'bg-transparent',
             )}
           />
           <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -119,12 +126,19 @@ function AccountFooter() {
             {user.fullName?.slice(0, 1)?.toUpperCase()}
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-label text-foreground">{user.fullName}</span>
+            <span className="block truncate text-label font-medium text-primary">
+              {user.fullName}
+            </span>
             <span className="block truncate text-caption text-muted-foreground">{user.email}</span>
           </span>
         </div>
       ) : null}
-      <Button variant="ghost" size="sm" className="w-full justify-start" onClick={handleLogout}>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="w-full justify-start text-primary hover:bg-primary-subtle hover:text-primary"
+        onClick={handleLogout}
+      >
         <LogOut className="h-4 w-4" />
         {t('auth.logout')}
       </Button>
@@ -142,7 +156,10 @@ export function Sidebar() {
         <Brand />
       </div>
 
-      <nav aria-label={t('nav.primary')} className="flex-1 space-y-0.5 overflow-y-auto p-3">
+      <nav
+        aria-label={t('nav.primary')}
+        className="dgp-scroll flex-1 space-y-1 overflow-y-auto p-3"
+      >
         <NavItems />
       </nav>
 
@@ -220,7 +237,10 @@ export function MobileSidebar({ open, onClose }) {
           </Button>
         </div>
 
-        <nav aria-label={t('nav.primary')} className="flex-1 space-y-0.5 overflow-y-auto p-3">
+        <nav
+          aria-label={t('nav.primary')}
+          className="dgp-scroll flex-1 space-y-1 overflow-y-auto p-3"
+        >
           <NavItems />
         </nav>
 

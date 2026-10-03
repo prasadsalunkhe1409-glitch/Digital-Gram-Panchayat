@@ -10,27 +10,32 @@ import { ChevronRight } from 'lucide-react';
  *
  * One component for every service, deliberately: the previous grid built its markup inline,
  * so any change to a tile had to be made in one place and remembered in the next.
+ *
+ * Every tile is the same object — same icon well, same title line, same two-line description,
+ * same action pinned to the bottom. The description is clamped rather than left to run, so a
+ * long one cannot make its tile taller than the one beside it; `h-full` lets the grid stretch
+ * them all to the tallest in the row.
  */
 export function ServiceCard({ to, icon: Icon, title, description, cta }) {
   return (
     <Link
       to={to}
-      className="group flex min-h-[7.5rem] min-w-0 flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-xs transition-[box-shadow,border-color] duration-150 hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group flex h-full min-h-[7.5rem] min-w-0 flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-xs transition-[box-shadow,border-color] duration-150 hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-subtle">
         <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
       </span>
 
       <span className="min-w-0">
-        <span className="block truncate text-body font-semibold text-foreground">{title}</span>
+        <span className="block truncate text-section font-semibold text-primary">{title}</span>
         {description ? (
-          <span className="mt-0.5 block text-caption leading-snug text-muted-foreground">
+          <span className="mt-0.5 line-clamp-2 block text-caption leading-snug text-muted-foreground">
             {description}
           </span>
         ) : null}
       </span>
 
-      <span className="mt-auto inline-flex items-center gap-1 text-caption font-medium text-primary">
+      <span className="mt-auto inline-flex items-center gap-1 text-[0.875rem] font-medium text-interactive-strong">
         {cta}
         {/* Decorative: the link's own accessible name is the title and description above. */}
         <ChevronRight

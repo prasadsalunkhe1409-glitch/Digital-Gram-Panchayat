@@ -1114,5 +1114,35 @@
       "Ward 5": "Ward 5",
       "Ward 6": "Ward 6"
     }
+  },
+  "admins": {
+    "title": "Administrator accounts",
+    "intro": "Only a root admin can add or remove officer accounts. Removing an officer deactivates the account; their past work stays on record.",
+    "add": "Add officer",
+    "addHint": "Creates an officer account for the admin portal.",
+    "fullName": "Full name",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 8 characters. Share it with the officer directly; it is never shown again.",
+    "mobile": "Mobile (optional)",
+    "noWard": "No ward",
+    "roleRoot": "Root admin",
+    "roleOfficer": "Officer",
+    "active": "Active",
+    "inactive": "Inactive",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "you": "You",
+    "created": "Officer account created",
+    "deactivated": "Account deactivated",
+    "activated": "Account activated",
+    "failed": "Could not complete that action",
+    "delete": "Delete permanently",
+    "deleteTitle": "Delete this admin permanently?",
+    "deleteBody": "This action cannot be undone. Historical records associated with this account will not be deleted.",
+    "deleteConfirm": "Delete permanently",
+    "deleteCancel": "Cancel",
+    "deleted": "Account deleted permanently",
+    "deactivateHint": "Deactivate blocks sign-in and keeps the account. Delete removes it, and is only possible when the officer is not named on any record."
   }
 }

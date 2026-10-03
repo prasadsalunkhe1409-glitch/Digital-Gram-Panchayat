@@ -35,7 +35,7 @@
        an ordinary table control, where it would read as a warning. */
     --accent-gold: 42 98% 57%; /* #FDBD26 */
     --accent-gold-hover: 38 95% 50%; /* darker #FDBD26 */
-    --accent-gold-foreground: 222 47% 11%; /* #0F172A */
+    --accent-gold-foreground: 224 64% 33%; /* #1E3B8B — dark blue on gold, 6.1:1 */
 
 
     /* Neutrals — #334155 slate, #F1F5F9 surface-secondary, #475569/#64748B text. */
@@ -147,6 +147,30 @@
 }
 
 @layer components {
+  /*
+   * Narrow, quiet scrollbar for a panel that scrolls inside the page — the navigation list.
+   * Left visible rather than hidden: the list is long enough that an officer needs to know
+   * there is more below, and an invisible scrollbar removes the only cue. Falls back to the
+   * platform scrollbar wherever these properties are unsupported.
+   */
+  .dgp-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .dgp-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .dgp-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .dgp-scroll::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+  }
+  .dgp-scroll:hover::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--input));
+  }
+
   /* Standard content column for officer screens — wide, but never edge-to-edge. */
   .dgp-page {
     @apply mx-auto w-full max-w-7xl;

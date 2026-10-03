@@ -181,7 +181,9 @@ export function PublicHome() {
           src={g.banner || VILLAGE_HERO}
           alt=""
           loading="eager"
-          fetchPriority="high"
+          // Lowercase: React 18 does not map the camelCase form and passes it through
+          // with a console warning on every render of this page.
+          fetchpriority="high"
           className="absolute inset-0 -z-10 h-full w-full object-cover object-center"
         />
         {/*
