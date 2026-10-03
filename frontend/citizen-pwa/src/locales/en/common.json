@@ -88,6 +88,7 @@
     "backHome": "Back to Home"
   },
   "common": {
+    "back": "Back",
     "loading": "Loading…",
     "online": "Online",
     "offline": "Offline",
@@ -250,7 +251,8 @@
     "ward": "Ward",
     "wardPlaceholder": "Select your ward",
     "wardRequired": "Choose your ward",
-    "wardNotSet": "Ward not set"
+    "wardNotSet": "Ward not set",
+    "backToWelcome": "Back to village page"
   },
   "complaint": {
     "category": {

@@ -113,10 +113,15 @@ export function LoginForm({ mode = 'villager' }) {
         </button>
       </div>
 
-      {/* Villager tab carries the lighter blue accent; officer keeps the brand navy. */}
+      {/*
+        Villager carries the palette's interactive blue, officer the brand navy — the same two
+        values the button system already defines, rather than a colour mixed in at the call
+        site. `bg-info` was doing this job before and sat outside the palette entirely.
+      */}
       <Button
         type="submit"
-        className={`w-full ${officer ? '' : 'bg-info hover:bg-info-strong'}`}
+        variant={officer ? 'default' : 'secondary'}
+        className="w-full"
         loading={isSubmitting}
       >
         {t('auth.login')}

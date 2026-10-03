@@ -12,7 +12,6 @@ const SECTIONS = [
   ['/tax', 'nav.tax'],
   ['/schemes', 'nav.schemes'],
   ['/users', 'nav.users'],
-  ['/notifications', 'nav.notifications'],
   ['/reports', 'nav.reports'],
   ['/audit', 'nav.audit'],
   ['/village', 'nav.village'],
@@ -20,8 +19,6 @@ const SECTIONS = [
   ['/meetings', 'nav.meetings'],
   ['/projects', 'nav.projects'],
   ['/polls', 'nav.polls'],
-  ['/documents', 'nav.documents'],
-  ['/feedback', 'nav.feedback'],
   ['/help', 'nav.help'],
 ];
 

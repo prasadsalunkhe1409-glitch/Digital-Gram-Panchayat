@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { BackButton } from '@/components/BackButton';
 import { User, Landmark } from 'lucide-react';
 import logo from '@dgp/shared/assets/logo.svg';
 import { cn } from '@/utils/cn';
@@ -30,6 +31,13 @@ export function Login() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[500px] flex-col justify-center px-4 py-10">
+      {/*
+        A way back to the public page. Someone who followed "Enter portal" and then decided
+        they only wanted the office timings had no route back except the browser button, and
+        on the installed PWA there is no browser button.
+      */}
+      <BackButton to="/welcome" label={t('auth.backToWelcome')} className="self-start" />
+
       {/* Masthead */}
       <div className="mb-6 flex flex-col items-center gap-2 text-center">
         <img src={logo} alt="" width={64} height={64} />
@@ -83,7 +91,11 @@ export function Login() {
           <span
             className={cn(
               'flex h-16 w-16 items-center justify-center rounded-full',
-              officer ? 'bg-primary-subtle text-primary' : 'bg-info-subtle text-info',
+              // Both wells are the palette's pale blue; the icon inside carries the
+              // distinction — navy for the officer door, interactive blue for the villager.
+              officer
+                ? 'bg-primary-subtle text-primary'
+                : 'bg-primary-subtle text-interactive-strong',
             )}
           >
             {officer ? (

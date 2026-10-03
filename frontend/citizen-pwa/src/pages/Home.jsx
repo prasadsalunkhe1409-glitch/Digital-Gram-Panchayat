@@ -24,11 +24,9 @@ import { TimetableSection } from '@/features/timetable/TimetableSection';
 import { ServiceCard } from '@/features/home/ServiceCard';
 import { NoticeCard } from '@/features/notices/components/NoticeCard';
 import { SchemeCard } from '@/features/schemes/components/SchemeCard';
-import { useUnreadCount } from '@/features/notifications/hooks';
 import { VillageHero } from '@/features/home/VillageHero';
 import { GlobalSearch } from '@/features/home/GlobalSearch';
 import { PriorityBoard } from '@/features/home/PriorityBoard';
-import { VillageStats } from '@/features/home/VillageStats';
 import { EventCard, daysUntil } from '@/features/home/EventCard';
 import { useMeetings, useProjects, useDownloads } from '@/features/governance/hooks';
 
@@ -69,7 +67,6 @@ export function Home() {
   const { data: schemes } = useSchemes();
   const { data: profile } = useVillageProfile();
   const { data: eventsData } = useVillageEvents();
-  const { data: unread = 0 } = useUnreadCount();
   // Fetched here purely so global search can reach them; each list caches for minutes.
   const { data: meetings } = useMeetings();
   const { data: projects } = useProjects();
@@ -109,18 +106,39 @@ export function Home() {
         downloads={downloads?.data}
       />
 
-      {/* 2 — what this particular citizen has to deal with, before anything generic */}
+      {/*
+        2 — services, immediately under the search box.
+        A citizen arriving here wants to *do* something. The services grid is the answer to
+        that, so it sits directly below the box they would otherwise type into; the personal
+        status band and the events follow it rather than pushing it below the fold.
+      */}
+      <section aria-labelledby="qs-h">
+        <SectionHeader id="qs-h" title={t('home.services')} />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {SERVICES.map(({ to, label, desc, icon }) => (
+            <ServiceCard
+              key={label}
+              to={to}
+              icon={icon}
+              title={t(label)}
+              description={t(desc)}
+              cta={t('home.svc.open')}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* 3 — what this particular citizen has to deal with, before anything generic */}
       <PriorityBoard
         activeComplaints={activeComplaints}
         pendingCerts={pendingCerts}
         outstanding={outstanding}
-        unread={unread}
         todayEvent={imminentEvent}
         latestNotice={latestNotices[0]}
         officeTimings={profile?.leadership?.officeTimings}
       />
 
-      {/* 3 — upcoming events */}
+      {/* 4 — upcoming events */}
       <section aria-labelledby="events-h">
         <SectionHeader
           id="events-h"
@@ -158,32 +176,19 @@ export function Home() {
         )}
       </section>
 
-      {/* 4 — quick services */}
-      <section aria-labelledby="qs-h">
-        <SectionHeader id="qs-h" title={t('home.services')} />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICES.map(({ to, label, desc, icon }) => (
-            <ServiceCard
-              key={label}
-              to={to}
-              icon={icon}
-              title={t(label)}
-              description={t(desc)}
-              cta={t('home.svc.open')}
-            />
-          ))}
-        </div>
-      </section>
-
       {/* 5 — when the village services run. Placed above the officials band because a
           collection time is the thing a citizen checks weekly; a member's number is the thing
           they look up once. */}
       <TimetableSection />
 
-      {/* 6 — the village in numbers */}
-      <VillageStats statistics={profile?.statistics} />
+      {/*
+        "Our village in numbers" is deliberately absent here. It is public-facing material
+        aimed at someone deciding whether to trust the portal, which is a question a signed-in
+        citizen has already answered. It still renders on /welcome, and the statistics API and
+        data are untouched — this is a visibility decision, not a removal.
+      */}
 
-      {/* 7 + 8 — notices and schemes, side by side on desktop */}
+      {/* 6 + 7 — notices and schemes, side by side on desktop */}
       <div className="grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="notices-h" className="min-w-0">
           <SectionHeader

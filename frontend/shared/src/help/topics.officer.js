@@ -136,14 +136,14 @@ export const OFFICER_TOPICS = [
       },
       {
         text: {
-          en: 'Add remarks if required, then tap "Generate & approve".',
-          mr: 'आवश्यक असल्यास शेरा लिहा आणि "तयार करा व मंजूर करा" दाबा.',
+          en: 'Add remarks if required, attach the prepared certificate PDF, then tap "Issue certificate".',
+          mr: 'आवश्यक असल्यास शेरा लिहा, तयार केलेल्या दाखल्याची PDF जोडा आणि "दाखला जारी करा" दाबा.',
         },
       },
       {
         text: {
-          en: 'The portal creates the PDF with a unique certificate number and QR code; the citizen can download it immediately.',
-          mr: 'पोर्टल अद्वितीय दाखला क्रमांक व QR कोडसह PDF तयार करते; नागरिक ती लगेच डाउनलोड करू शकतो.',
+          en: 'The portal records your PDF against a unique certificate number for verification; the citizen can download it immediately. The portal does not create the certificate for you.',
+          mr: 'पोर्टल तुमची PDF पडताळणीसाठी अद्वितीय दाखला क्रमांकासह नोंदवते; नागरिक ती लगेच डाउनलोड करू शकतो. पोर्टल तुमच्यासाठी दाखला तयार करत नाही.',
         },
       },
     ],

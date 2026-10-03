@@ -1,6 +1,5 @@
-import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { BackButton } from '@/components/BackButton';
 
 /**
  * Title block for a page: optional back link, title, optional subtitle, optional trailing
@@ -10,15 +9,7 @@ import { cn } from '@/utils/cn';
 export function PageHeader({ title, subtitle, backTo, backLabel, action, className }) {
   return (
     <div className={cn('mb-5', className)}>
-      {backTo ? (
-        <Link
-          to={backTo}
-          className="mb-3 -ml-1 inline-flex min-h-11 items-center gap-1 rounded-md px-1 text-body text-muted-foreground transition-colors duration-150 hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          {backLabel}
-        </Link>
-      ) : null}
+      {backTo ? <BackButton to={backTo} label={backLabel} /> : null}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-title text-foreground">{title}</h1>

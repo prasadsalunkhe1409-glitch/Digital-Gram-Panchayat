@@ -6,6 +6,7 @@ import { CERT_TYPES, CERT_TYPE_FIELDS, CERT_DOC_REQUIREMENTS } from '@dgp/shared
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { controlClass } from '@/components/ui/input';
+import { cn } from '@/utils/cn';
 import { Dialog } from '@/components/ui/dialog';
 import { taxService } from '@/features/tax/taxService';
 import { useOfficerCreateCertificate } from './hooks';
@@ -27,21 +28,25 @@ export function AddCertificateDialog({ open, onClose }) {
   const create = useOfficerCreateCertificate();
 
   const [certificateType, setCertificateType] = useState(CERT_TYPES[0]);
-  const [mobile, setMobile] = useState('');
+  const [term, setTerm] = useState('');
+  const [results, setResults] = useState(null);
   const [citizen, setCitizen] = useState(null);
   const [lookingUp, setLookingUp] = useState(false);
   const [values, setValues] = useState({});
   const [docs, setDocs] = useState({});
+  const [certificate, setCertificate] = useState(null);
 
   const fields = CERT_TYPE_FIELDS[certificateType] ?? [];
   const groups = useMemo(() => CERT_DOC_REQUIREMENTS[certificateType] ?? [], [certificateType]);
 
   const reset = () => {
     setCertificateType(CERT_TYPES[0]);
-    setMobile('');
+    setTerm('');
+    setResults(null);
     setCitizen(null);
     setValues({});
     setDocs({});
+    setCertificate(null);
   };
 
   const close = () => {
@@ -49,18 +54,28 @@ export function AddCertificateDialog({ open, onClose }) {
     onClose();
   };
 
-  /** A certificate belongs to somebody; the officer resolves who before anything else. */
+  /**
+   * A certificate belongs to somebody; the officer resolves who before anything else.
+   *
+   * Partial search over name, mobile and property/tax number, same endpoint and same
+   * server-side matching the tax form uses — an officer should not have to learn two
+   * different ways to find the same citizen.
+   */
   const lookup = async () => {
-    if (!/^[6-9]\d{9}$/.test(mobile)) {
-      toast.error(t('dakhala.add.badMobile'));
+    const q = term.trim();
+    if (!q) {
+      toast.error(t('dakhala.add.searchEmpty'));
       return;
     }
     setLookingUp(true);
     try {
-      setCitizen(await taxService.lookupCitizen(mobile));
+      const found = await taxService.searchCitizens(q);
+      setResults(found);
+      setCitizen(found.length === 1 ? found[0] : null);
     } catch (err) {
+      setResults([]);
       setCitizen(null);
-      toast.error(err.response?.data?.error?.message || t('dakhala.add.citizenNotFound'));
+      toast.error(err.response?.data?.error?.message || t('dakhala.add.searchFailed'));
     } finally {
       setLookingUp(false);
     }
@@ -81,6 +96,13 @@ export function AddCertificateDialog({ open, onClose }) {
       return;
     }
 
+    // Counter issuance issues the certificate immediately, so the prepared PDF is required
+    // here exactly as it is on the review screen. Nothing is generated.
+    if (!certificate) {
+      toast.error(t('dakhala.add.certificateRequired'));
+      return;
+    }
+
     const attached = groups.filter((g) => docs[g.key]);
     create.mutate(
       {
@@ -93,6 +115,7 @@ export function AddCertificateDialog({ open, onClose }) {
           ),
         },
         files: attached.map((g) => docs[g.key]),
+        certificate,
       },
       {
         onSuccess: (created) => {
@@ -123,16 +146,21 @@ export function AddCertificateDialog({ open, onClose }) {
       }
     >
       <form id="add-certificate-form" onSubmit={submit} className="space-y-4">
-        <Field label={t('dakhala.add.citizenMobile')}>
+        <Field label={t('dakhala.add.citizenSearch')}>
           {({ id }) => (
             <div className="flex gap-2">
               <input
                 id={id}
                 className={controlClass}
-                value={mobile}
-                inputMode="numeric"
-                placeholder="9876543210"
-                onChange={(e) => setMobile(e.target.value)}
+                value={term}
+                placeholder={t('dakhala.add.citizenSearchHint')}
+                onChange={(e) => setTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    lookup();
+                  }
+                }}
               />
               <Button
                 type="button"
@@ -151,6 +179,31 @@ export function AddCertificateDialog({ open, onClose }) {
             <UserCheck className="h-4 w-4" aria-hidden="true" />
             {citizen.fullName} · {citizen.mobile}
           </p>
+        ) : null}
+
+        {/* Several matches: the officer chooses, rather than the dialog guessing. */}
+        {!citizen && results?.length ? (
+          <ul className="divide-y divide-border rounded-md border border-border">
+            {results.map((c) => (
+              <li key={c.id}>
+                <button
+                  type="button"
+                  onClick={() => setCitizen(c)}
+                  className="flex min-h-11 w-full flex-wrap items-center gap-x-2 px-3 py-2 text-left text-body text-foreground transition-colors duration-150 hover:bg-muted/50"
+                >
+                  <span className="font-medium">{c.fullName}</span>
+                  <span className="text-caption text-muted-foreground">{c.mobile}</span>
+                  {c.ward ? (
+                    <span className="text-caption text-muted-foreground">· {c.ward}</span>
+                  ) : null}
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        {!citizen && results?.length === 0 ? (
+          <p className="text-body text-muted-foreground">{t('dakhala.add.noCitizens')}</p>
         ) : null}
 
         <Field label={t('dakhala.add.type')}>
@@ -235,6 +288,27 @@ export function AddCertificateDialog({ open, onClose }) {
             })}
           </p>
         </div>
+
+        {/*
+          The officially issued certificate — distinct from the supporting documents above,
+          which are the citizen's evidence. PDF only: an image of a certificate is not one.
+        */}
+        <Field label={t('dakhala.add.certificateFile')}>
+          {({ id }) => (
+            <div className="space-y-1">
+              <input
+                id={id}
+                type="file"
+                accept="application/pdf"
+                className={cn(controlClass, 'h-auto py-2 file:mr-3 file:border-0')}
+                onChange={(e) => setCertificate(e.target.files?.[0] ?? null)}
+              />
+              <p className="text-caption text-muted-foreground">
+                {t('dakhala.add.certificateFileHint')}
+              </p>
+            </div>
+          )}
+        </Field>
       </form>
     </Dialog>
   );

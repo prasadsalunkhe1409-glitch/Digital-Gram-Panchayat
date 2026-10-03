@@ -13,8 +13,11 @@ export const taxService = {
     const { data } = await apiClient.get(`/admin/tax/${id}/history`);
     return data.data;
   },
-  async lookupCitizen(mobile) {
-    const { data } = await apiClient.get('/admin/tax/lookup', { params: { mobile } });
+  /** Partial citizen search: name, mobile or property/tax number. Matching is server-side. */
+  async searchCitizens(q, ward) {
+    const { data } = await apiClient.get('/admin/tax/lookup', {
+      params: { q, ...(ward ? { ward } : {}) },
+    });
     return data.data;
   },
   async create(values, files = []) {

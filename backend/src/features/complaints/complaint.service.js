@@ -22,6 +22,18 @@ function buildComplaintId(year, seq) {
 export async function createComplaint({ citizenId, body, files }) {
   const images = await uploadImages(files);
 
+  /*
+   * The ward comes from the citizen's own account, never from the request.
+   *
+   * A complaint's ward decides which officer's queue it lands in, so letting the submitter
+   * name it would let anyone file into a ward they do not live in. It is read from the
+   * authenticated user instead, and a citizen registered before the ward field existed still
+   * files successfully — their complaint simply carries no ward, exactly as the historical
+   * ones do. Nothing is backfilled and nothing is guessed.
+   */
+  const author = await User.findById(citizenId).select('ward').lean();
+  const ward = author?.ward || undefined;
+
   const year = new Date().getFullYear();
   const seq = await getNextSequence(`complaint-${year}`);
   const complaintId = buildComplaintId(year, seq);
@@ -34,7 +46,7 @@ export async function createComplaint({ citizenId, body, files }) {
     description: body.description,
     images,
     address: body.address || undefined,
-    ward: body.ward || undefined,
+    ward,
     priority: body.priority || 'Medium',
     status: 'Pending',
     statusHistory: [{ status: 'Pending', by: citizenId, at: new Date() }],

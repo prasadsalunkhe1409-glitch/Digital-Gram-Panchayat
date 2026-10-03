@@ -88,6 +88,7 @@
     "backHome": "मुख्यपृष्ठावर परत जा"
   },
   "common": {
+    "back": "मागे",
     "loading": "लोड होत आहे…",
     "online": "ऑनलाइन",
     "offline": "ऑफलाइन",
@@ -250,7 +251,8 @@
     "ward": "प्रभाग",
     "wardPlaceholder": "तुमचा प्रभाग निवडा",
     "wardRequired": "तुमचा प्रभाग निवडा",
-    "wardNotSet": "प्रभाग नोंदवलेला नाही"
+    "wardNotSet": "प्रभाग नोंदवलेला नाही",
+    "backToWelcome": "गाव पृष्ठावर परत"
   },
   "complaint": {
     "category": {

@@ -15,6 +15,10 @@ const PNG = Buffer.from(
   'base64',
 );
 
+// A minimal but genuine PDF: the upload path verifies the leading bytes, so the issued
+// certificate fixture has to actually start with %PDF-.
+const PDF = Buffer.from('%PDF-1.4 minimal fixture for upload tests', 'utf8');
+
 beforeAll(async () => {
   mongo = await MongoMemoryServer.create();
   await mongoose.connect(mongo.getUri());
@@ -50,16 +54,14 @@ async function officerToken() {
 }
 
 async function citizen(fullName, mobile, ward) {
-  const res = await request(app)
-    .post('/api/v1/auth/register')
-    .send({
-      fullName,
-      mobile,
-      password: 'Secret@123',
-      village: 'Sakharale',
-      address: 'Road',
-      ward,
-    });
+  const res = await request(app).post('/api/v1/auth/register').send({
+    fullName,
+    mobile,
+    password: 'Secret@123',
+    village: 'Sakharale',
+    address: 'Road',
+    ward,
+  });
   return { id: res.body.data.user.id, token: res.body.data.token };
 }
 
@@ -108,6 +110,8 @@ function officerCreate(token, citizenId, over = {}) {
     docs.forEach((d, i) =>
       req.attach('documents', PNG, { filename: `${d.docType}-${i}.png`, contentType: 'image/png' }),
     );
+    // The officer issues a document they prepared; the API refuses issuance without it.
+    req.attach('certificate', PDF, { filename: 'issued.pdf', contentType: 'application/pdf' });
   }
   return req;
 }

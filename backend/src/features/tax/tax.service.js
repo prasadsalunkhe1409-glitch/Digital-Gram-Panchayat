@@ -1,6 +1,6 @@
 import { ROLES } from '@dgp/shared';
 import { parsePagination } from '../../utils/pagination.js';
-import { citizenIdsFor } from '../../utils/ward.js';
+import { citizenIdsFor, wardCondition } from '../../utils/ward.js';
 import { TaxRecord } from './tax.model.js';
 import { getNextSequence } from '../complaints/counter.model.js';
 import { User } from '../auth/user.model.js';
@@ -12,6 +12,9 @@ import { notifyTaxUpdate } from '../notifications/notification.service.js';
 function buildTaxRecordId(year, seq) {
   return `TAX-${year}-${String(seq).padStart(6, '0')}`;
 }
+
+/** An officer picks from a shortlist; an unbounded citizen list helps nobody at a counter. */
+const CITIZEN_SEARCH_LIMIT = 20;
 
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -50,21 +53,69 @@ async function audit(officerId, action, record, before, after) {
 }
 
 /**
- * Tax-scoped citizen lookup by mobile so an officer can attach a record to the right
- * person. Returns minimal fields only — full user management arrives in M8.
- * @param {string} mobile
+ * Tax-scoped citizen search, so an officer can attach a record to the right person.
+ *
+ * It used to demand a full ten-digit mobile and return one citizen or a 404. An officer
+ * standing at a counter rarely has that: they have a half-remembered name, the last few
+ * digits, or the property number written on the bill in front of them. This accepts any of
+ * those as a partial, case-insensitive fragment and returns the candidates to choose from.
+ *
+ * Three arms, resolved in two queries regardless of how many rows match:
+ *   - name    — partial, case-insensitive
+ *   - mobile  — partial, so the trailing digits of a number are enough
+ *   - record  — a tax record id or property number, mapped back to its owner by one
+ *               `distinct` over the matching records
+ *
+ * `q` is escaped before it reaches a RegExp, so a fragment like `a.*b` or `(` is matched
+ * literally and cannot widen the search or crash the query.
+ *
+ * Results are capped: an officer picks from a shortlist, and an unbounded list of citizens is
+ * both useless at a counter and a needless disclosure.
+ *
+ * @param {{ q: string, ward?: string }} params
+ * @returns {Promise<Array<{id: string, fullName: string, mobile: string, village: string, ward: string|null}>>}
  */
-export async function lookupCitizen(mobile) {
-  const citizen = await User.findOne({ mobile, role: ROLES.CITIZEN }).select(
-    'fullName mobile village',
-  );
-  if (!citizen) throw new AppError(404, 'CITIZEN_NOT_FOUND', 'No citizen found with that mobile');
-  return {
-    id: citizen.id,
-    fullName: citizen.fullName,
-    mobile: citizen.mobile,
-    village: citizen.village,
+export async function searchCitizens({ q, ward } = {}) {
+  const term = (q ?? '').trim();
+  if (!term) return [];
+
+  const rx = new RegExp(escapeRegex(term), 'i');
+
+  // Who owns a record whose identifier contains the fragment. One query, not one per row.
+  const byRecord = await TaxRecord.distinct('citizenId', {
+    isActive: true,
+    $or: [{ taxRecordId: rx }, { propertyNumber: rx }],
+  });
+
+  const filter = {
+    role: ROLES.CITIZEN,
+    $or: [
+      { fullName: rx },
+      { mobile: rx },
+      ...(byRecord.length ? [{ _id: { $in: byRecord } }] : []),
+    ],
   };
+
+  // Ward composes with the search rather than replacing it: an officer filtering to Ward 3
+  // and typing "Rah" wants the Rahuls in Ward 3, not every Rahul.
+  if (ward) {
+    const cond = wardCondition(ward);
+    if (cond !== null) filter.ward = cond;
+  }
+
+  const rows = await User.find(filter)
+    .select('fullName mobile village ward')
+    .sort({ fullName: 1 })
+    .limit(CITIZEN_SEARCH_LIMIT)
+    .lean();
+
+  return rows.map((c) => ({
+    id: String(c._id),
+    fullName: c.fullName,
+    mobile: c.mobile,
+    village: c.village,
+    ward: c.ward ?? null,
+  }));
 }
 
 /** @param {{ officerId: string, body: object }} params */

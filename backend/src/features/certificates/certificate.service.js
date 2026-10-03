@@ -8,14 +8,12 @@ import {
 import { parsePagination } from '../../utils/pagination.js';
 import { citizenIdsFor } from '../../utils/ward.js';
 import { CertificateApplication } from './certificate.model.js';
-import { generateCertificatePdf } from './pdf.service.js';
-import { generateVerificationId, generateQrPngBuffer } from './qr.service.js';
+import { generateVerificationId } from './qr.service.js';
 import { getNextSequence } from '../complaints/counter.model.js';
 import { User } from '../auth/user.model.js';
 import { AppError } from '../../utils/app-error.js';
-import { uploadAttachments, uploadPdfBuffer } from '../../utils/upload.js';
+import { uploadAttachments } from '../../utils/upload.js';
 import { translateToBoth } from '../translation/translation.service.js';
-import { getPublicProfile } from '../village/village.service.js';
 import { writeAudit } from '../audit/audit.service.js';
 import { notifyDakhalaStatus } from '../notifications/notification.service.js';
 
@@ -305,28 +303,24 @@ export async function review(id, officerId) {
   return app.toJSON();
 }
 
-/** Village Profile is optional branding — never let its absence block issuance. */
-async function loadVillageSafe() {
-  try {
-    return await getPublicProfile();
-  } catch {
-    return null;
-  }
-}
-
 /**
- * Approve: optionally apply officer edits, then generate the official certificate (number,
- * verification id, QR, PDF), store it, mark Approved, notify + audit.
+ * Issue a certificate the officer has prepared.
  *
- * `edits` is optional and backward compatible — an approve with no body behaves exactly as
- * before. Supported edits (all optional): `applicationData` (merged over the existing data and
- * re-validated for the type) and `officerRemarks` (printed on the certificate).
+ * This used to generate the PDF itself: the officer pressed one button and the system
+ * produced, numbered and issued a document nobody had checked. A Gram Panchayat certificate
+ * carries a signature and a seal, so the artefact an officer issues is the one they prepared
+ * — it is uploaded here, and this function records the issuance rather than authoring it.
+ *
+ * Everything downstream is unchanged and deliberately not duplicated: the same serial from
+ * `buildCertificateNumber`, the same verification id, the same audit entry, the same citizen
+ * notification, the same single status pipeline.
  *
  * @param {string} id
  * @param {string} officerId
- * @param {{ applicationData?: object, officerRemarks?: string }} [edits]
+ * @param {object} [edits] applicationData / officerRemarks corrections made before issuing
+ * @param {{ buffer: Buffer, mimetype: string, originalname: string }} [file] the prepared certificate
  */
-export async function approve(id, officerId, edits = {}) {
+export async function approve(id, officerId, edits = {}, file = null) {
   const app = await findActive(id);
   if (app.status === 'Approved') {
     // Idempotent — already approved.
@@ -347,29 +341,34 @@ export async function approve(id, officerId, edits = {}) {
     app.officerRemarks = edits.officerRemarks.trim() || undefined;
   }
 
-  const [citizen, officer, village] = await Promise.all([
-    User.findById(app.citizenId).select('fullName mobile village'),
-    User.findById(officerId).select('fullName'),
-    loadVillageSafe(),
-  ]);
+  // No file, no issuance. There is nothing to fall back to on purpose: a generated document
+  // is what this screen stopped doing, so issuing without one would be the old behaviour
+  // under a new name.
+  if (!file) {
+    throw new AppError(400, 'CERTIFICATE_REQUIRED', 'Attach the prepared certificate to issue', {
+      certificate: 'Upload the signed certificate before approving',
+    });
+  }
+
+  // The route's upload filter already rejects a non-PDF, and the magic-byte check already
+  // rejects a mislabelled one. This repeats the rule at the service boundary because
+  // `approve()` is also reached from the counter-issuance path, and the stored artefact is
+  // what a citizen downloads as their certificate for years afterwards.
+  if (file.mimetype !== 'application/pdf') {
+    throw new AppError(400, 'INVALID_FILE_TYPE', 'The certificate must be a PDF', {
+      certificate: 'Upload the certificate as a PDF',
+    });
+  }
+
+  const citizen = await User.findById(app.citizenId).select('fullName mobile village');
 
   const year = new Date().getFullYear();
   const certificateNumber = await buildCertificateNumber(app.certificateType, year);
   const verificationId = generateVerificationId();
   const issuedAt = new Date();
-  const qrBuffer = await generateQrPngBuffer(verificationId).catch(() => null);
 
-  const pdfBuffer = await generateCertificatePdf({
-    application: app.toJSON(),
-    citizen,
-    officer,
-    village,
-    qrBuffer,
-    certificateNumber,
-    verificationId,
-    issuedAt,
-  });
-  const pdfUrl = await uploadPdfBuffer(pdfBuffer, 'certificates/pdf');
+  const [uploaded] = await uploadAttachments([file], 'certificates/pdf');
+  const pdfUrl = uploaded.url;
 
   const before = { status: app.status };
   app.status = 'Approved';
@@ -480,7 +479,7 @@ export async function softDelete(id, officerId) {
  *
  * Built entirely out of the existing pieces: the same type field definitions, the same
  * required-document groups, the same magic-byte-checked upload path, the same counter, the
- * same `approve()` that mints the number, renders the PDF and writes the audit entry. There
+ * same `approve()` that mints the number, records the issuance and writes the audit entry. There
  * is one certificate pipeline, and this is a different door into it — a second implementation
  * would be a second place for the certificate format to drift.
  *
@@ -492,7 +491,7 @@ export async function softDelete(id, officerId) {
  *
  * @param {{ officerId: string, body: object, files: object[] }} params
  */
-export async function createByOfficer({ officerId, body, files }) {
+export async function createByOfficer({ officerId, body, files, certificateFile }) {
   const certificateType = body.certificateType;
   // CERT_TYPES, not CERT_TYPE_FIELDS: the field map still holds Residence so historical
   // records render, but nothing new may be issued under a withdrawn type.
@@ -542,6 +541,6 @@ export async function createByOfficer({ officerId, body, files }) {
     citizenId: citizen.id,
   });
 
-  // The existing issuance path: number, verification id, PDF, notification, audit.
-  return approve(app.id, officerId);
+  // The existing issuance path — one pipeline, now carrying the officer's prepared document.
+  return approve(app.id, officerId, {}, certificateFile);
 }

@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  ArrowLeft,
   ImagePlus,
   Paperclip,
   FileText,
@@ -16,6 +15,7 @@ import {
 import toast from 'react-hot-toast';
 import { SCHEME_CATEGORIES } from '@dgp/shared';
 import { Button } from '@/components/ui/button';
+import { BackButton } from '@/components/BackButton';
 import { controlClass } from '@/components/ui/input';
 import { SafeImage } from '@/components/SafeImage';
 import { cn } from '@/utils/cn';
@@ -161,13 +161,7 @@ export function SchemeForm() {
 
   return (
     <div className="max-w-2xl">
-      <Link
-        to="/schemes"
-        className="mb-3 -ml-1 inline-flex min-h-9 items-center gap-1 rounded-md px-1 text-body text-muted-foreground transition-colors duration-150 hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {t('scheme.form.back')}
-      </Link>
+      <BackButton to="/schemes" label={t('scheme.form.back')} />
 
       <h1 className="mb-4 text-title text-foreground">
         {isEdit ? t('scheme.form.editTitle') : t('scheme.form.createTitle')}

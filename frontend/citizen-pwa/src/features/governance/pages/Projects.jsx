@@ -133,7 +133,7 @@ export function Projects() {
 
   return (
     <div className="dgp-page">
-      <PageHeader title={t('project.title')} subtitle={t('project.intro')} />
+      <PageHeader backTo="/" title={t('project.title')} subtitle={t('project.intro')} />
 
       {summary?.count ? (
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">

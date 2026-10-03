@@ -30,7 +30,7 @@ export function NoticeList() {
 
   return (
     <div className="dgp-page-wide">
-      <ModuleHeader art={NoticeMotif} title={t('notice.list.title')} />
+      <ModuleHeader backTo="/" art={NoticeMotif} title={t('notice.list.title')} />
 
       <div className="mb-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
         <div className="relative sm:max-w-sm sm:flex-1">

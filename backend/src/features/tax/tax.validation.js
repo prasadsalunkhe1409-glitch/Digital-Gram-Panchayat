@@ -2,6 +2,13 @@ import { body, param, query } from 'express-validator';
 import { TAX_TYPES, PAYMENT_STATUSES } from '@dgp/shared';
 import { WARD_FILTER_VALUES } from '../../utils/ward.js';
 
+export const citizenSearchValidation = [
+  // A fragment, not a whole number: one character is enough to start narrowing, and the
+  // service escapes it before it reaches a RegExp.
+  query('q').trim().isLength({ min: 1, max: 80 }).withMessage('Enter a name or number to search'),
+  query('ward').optional({ values: 'falsy' }).isIn(WARD_FILTER_VALUES),
+];
+
 export const createTaxValidation = [
   body('citizenId').isMongoId().withMessage('Valid citizen is required'),
   body('propertyNumber').trim().notEmpty().withMessage('Property number is required'),

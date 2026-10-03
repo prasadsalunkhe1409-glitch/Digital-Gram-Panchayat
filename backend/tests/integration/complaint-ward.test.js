@@ -135,3 +135,81 @@ describe('officer complaint ward filter', () => {
     expect(res.body.data.ward).toBe('ward three');
   });
 });
+
+/**
+ * A complaint's ward decides whose queue it lands in, so it is read from the citizen's own
+ * account and never from the request they send.
+ */
+describe('a complaint takes its ward from the citizen who filed it', () => {
+  async function citizenToken(mobile, ward) {
+    const res = await request(app)
+      .post('/api/v1/auth/register')
+      .send({
+        fullName: 'Citizen',
+        mobile,
+        password: 'Secret@123',
+        village: 'Sakharale',
+        address: 'Main Road',
+        ...(ward ? { ward } : {}),
+      });
+    return res.body.data.token;
+  }
+
+  const file = (token, extra = {}) =>
+    request(app)
+      .post('/api/v1/complaints')
+      .set('Authorization', `Bearer ${token}`)
+      .field('category', 'WaterSupply')
+      .field('title', 'Leak on the main road')
+      .field('description', 'Water has been leaking for two days near the temple.')
+      .field(Object.keys(extra)[0] ?? 'priority', Object.values(extra)[0] ?? 'Medium');
+
+  it('stamps the ward recorded on the account', async () => {
+    const token = await citizenToken('9871100001', 'Ward 4');
+    const res = await file(token);
+
+    expect(res.status).toBe(201);
+    const stored = await Complaint.findById(res.body.data.id).lean();
+    expect(stored.ward).toBe('Ward 4');
+  });
+
+  it('ignores a ward the citizen tries to send', async () => {
+    const token = await citizenToken('9871100002', 'Ward 2');
+    const res = await file(token, { ward: 'Ward 6' });
+
+    expect(res.status).toBe(201);
+    // Filing into someone else's ward is exactly what deriving it server-side prevents.
+    const stored = await Complaint.findById(res.body.data.id).lean();
+    expect(stored.ward).toBe('Ward 2');
+  });
+
+  it('lets a citizen with no ward file anyway, carrying no ward', async () => {
+    // Accounts created before the ward field exists are not backfilled and not blocked.
+    const unwarded = await User.create({
+      role: ROLES.CITIZEN,
+      fullName: 'Legacy Citizen',
+      mobile: '9871100003',
+      village: 'Sakharale',
+      address: 'Main Road',
+      passwordHash: await hashPassword('Secret@123'),
+    });
+    const login = await request(app)
+      .post('/api/v1/auth/login')
+      .send({ mobile: '9871100003', password: 'Secret@123' });
+    const res = await file(login.body.data.token);
+
+    expect(res.status).toBe(201);
+    const stored = await Complaint.findById(res.body.data.id).lean();
+    expect(stored.ward == null).toBe(true);
+    expect(String(stored.citizenId)).toBe(String(unwarded._id));
+  });
+
+  it('files into the officer ward filter it was stamped with', async () => {
+    const cToken = await citizenToken('9871100004', 'Ward 5');
+    await file(cToken);
+    const oToken = await officerToken();
+
+    expect((await list(oToken, '?ward=Ward%205')).body.data.total).toBe(1);
+    expect((await list(oToken, '?ward=Ward%203')).body.data.total).toBe(0);
+  });
+});

@@ -149,7 +149,7 @@ export function Polls() {
 
   return (
     <div className="dgp-page">
-      <PageHeader title={t('poll.title')} subtitle={t('poll.intro')} />
+      <PageHeader backTo="/" title={t('poll.title')} subtitle={t('poll.intro')} />
 
       {isLoading ? (
         <SkeletonList count={2} />

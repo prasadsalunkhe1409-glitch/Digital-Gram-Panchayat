@@ -10,8 +10,8 @@ export function NotificationSettings() {
   return (
     <div className="dgp-page">
       <PageHeader
-        backTo="/notifications"
-        backLabel={t('notif.back')}
+        backTo="/settings"
+        backLabel={t('settings.title')}
         title={t('notif.settings.title')}
         subtitle={t('notif.settings.subtitle')}
       />

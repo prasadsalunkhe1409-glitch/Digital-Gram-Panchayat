@@ -18,6 +18,10 @@ const PNG = Buffer.from(
   'base64',
 );
 
+// A minimal but genuine PDF: the upload path verifies the leading bytes, so the issued
+// certificate fixture has to actually start with %PDF-.
+const PDF = Buffer.from('%PDF-1.4 minimal fixture for upload tests', 'utf8');
+
 const MARRIAGE_DATA = {
   groomName: 'Amit Patil',
   brideName: 'Sneha Patil',
@@ -97,10 +101,15 @@ async function issueCertificate(edits) {
   await request(app)
     .patch(`/api/v1/admin/dakhala/${id}/review`)
     .set('Authorization', `Bearer ${oToken}`);
-  const approveRes = await request(app)
+  // Issuance is multipart now: the officer attaches the certificate they prepared.
+  const approveReq = request(app)
     .patch(`/api/v1/admin/dakhala/${id}/approve`)
     .set('Authorization', `Bearer ${oToken}`)
-    .send(edits || {});
+    .attach('certificate', PDF, { filename: 'issued.pdf', contentType: 'application/pdf' });
+  for (const [k, v] of Object.entries(edits || {})) {
+    approveReq.field(k, typeof v === 'string' ? v : JSON.stringify(v));
+  }
+  const approveRes = await approveReq;
   return approveRes.body.data;
 }
 

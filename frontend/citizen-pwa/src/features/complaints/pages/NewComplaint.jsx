@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { generateIdempotencyKey } from '@dgp/shared';
 import { Button } from '@/components/ui/button';
+import { BackButton } from '@/components/BackButton';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { MapView } from '@/components/MapView';
 import { enqueueComplaint } from '@/services/offline-queue';
@@ -75,6 +76,9 @@ export function NewComplaint() {
 
   return (
     <div className="mx-auto w-full max-w-md px-4 py-6">
+      {/* Filing a complaint is reached from Home and from the complaint list; either way the
+          citizen needs a way out that is not the browser chrome. */}
+      <BackButton to="/complaints" />
       <h1 className="mb-4 text-lg font-semibold text-foreground">{t('complaint.form.title')}</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>

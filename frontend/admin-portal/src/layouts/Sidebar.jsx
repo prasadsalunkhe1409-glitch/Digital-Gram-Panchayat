@@ -11,7 +11,6 @@ import {
   BookOpen,
   Users,
   BarChart3,
-  Bell,
   ScrollText,
   Home,
   CalendarDays,
@@ -22,8 +21,6 @@ import {
   Gavel,
   HardHat,
   Vote,
-  FolderDown,
-  Star,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useAuth } from '@/hooks/useAuth';
@@ -37,7 +34,6 @@ const items = [
   { to: '/tax', label: 'nav.tax', icon: Landmark },
   { to: '/schemes', label: 'nav.schemes', icon: BookOpen },
   { to: '/users', label: 'nav.users', icon: Users },
-  { to: '/notifications', label: 'nav.notifications', icon: Bell },
   { to: '/reports', label: 'nav.reports', icon: BarChart3 },
   { to: '/audit', label: 'nav.audit', icon: ScrollText },
   { to: '/village', label: 'nav.village', icon: Home },
@@ -46,8 +42,6 @@ const items = [
   { to: '/timetable', label: 'nav.timetable', icon: CalendarClock },
   { to: '/projects', label: 'nav.projects', icon: HardHat },
   { to: '/polls', label: 'nav.polls', icon: Vote },
-  { to: '/documents', label: 'nav.documents', icon: FolderDown },
-  { to: '/feedback', label: 'nav.feedback', icon: Star },
   { to: '/help', label: 'nav.help', icon: HelpCircle },
 ];
 

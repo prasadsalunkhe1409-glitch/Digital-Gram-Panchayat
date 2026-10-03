@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
-  Bell,
   CalendarClock,
   CheckCircle2,
   ChevronRight,
@@ -60,7 +59,7 @@ function daysUntil(value) {
  * What this citizen has to deal with today, above everything else.
  *
  * The dashboard used to open with the same content for everybody. This band is assembled per
- * person — their own open complaints, applications, dues and unread messages come first, then
+ * person — their own open complaints, applications and dues come first, then
  * anything happening in the village today. When a citizen genuinely has nothing outstanding it
  * says so plainly rather than padding the screen with empty cards.
  */
@@ -68,7 +67,6 @@ export function PriorityBoard({
   activeComplaints,
   pendingCerts,
   outstanding,
-  unread,
   todayEvent,
   latestNotice,
   officeTimings,
@@ -105,16 +103,6 @@ export function PriorityBoard({
       title: t('home.priority.tax', { amount: formatCurrency(outstanding, locale) }),
       detail: t('home.priority.taxHint'),
       to: '/tax',
-    });
-  }
-  if (unread > 0) {
-    personal.push({
-      key: 'unread',
-      icon: Bell,
-      tone: 'info',
-      title: t('home.priority.unread', { count: unread }),
-      detail: t('home.priority.unreadHint'),
-      to: '/notifications',
     });
   }
 

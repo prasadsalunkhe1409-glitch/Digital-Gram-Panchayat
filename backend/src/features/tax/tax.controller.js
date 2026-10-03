@@ -9,9 +9,9 @@ export const listMine = asyncHandler(async (req, res) => {
 });
 
 // ---- Officer ----
-export const lookupCitizen = asyncHandler(async (req, res) => {
-  const citizen = await taxService.lookupCitizen(req.query.mobile);
-  res.status(200).json(successResponse(citizen));
+export const searchCitizens = asyncHandler(async (req, res) => {
+  const citizens = await taxService.searchCitizens({ q: req.query.q, ward: req.query.ward });
+  res.status(200).json(successResponse(citizens));
 });
 
 export const adminList = asyncHandler(async (req, res) => {

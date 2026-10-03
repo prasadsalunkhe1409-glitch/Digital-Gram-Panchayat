@@ -22,6 +22,7 @@ export function ComplaintHistory() {
   return (
     <div className="dgp-page-wide">
       <ModuleHeader
+        backTo="/"
         art={ComplaintMotif}
         title={t('complaint.history.title')}
         action={

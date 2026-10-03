@@ -18,6 +18,20 @@ export function Dialog({ open, onClose, title, description, children, footer, cl
   const panelRef = useRef(null);
   const restoreRef = useRef(null);
 
+  /*
+   * `onClose` is held in a ref, and the effect below depends on `open` alone.
+   *
+   * Every caller passes an inline `onClose={() => setOpen(false)}`, so its identity changes on
+   * each render. With `onClose` in the dependency array, one keystroke inside the dialog ran
+   * the whole open/close effect again: the cleanup restored focus to the element that opened
+   * the dialog, the re-run then captured *that* element as the new restore target and moved
+   * focus to the panel — so the field lost focus after a single character, and the real
+   * restore target was overwritten. Keeping the handler in a ref lets Escape always call the
+   * latest one while the effect runs only when the dialog actually opens or closes.
+   */
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     if (!open) return undefined;
 
@@ -26,7 +40,7 @@ export function Dialog({ open, onClose, title, description, children, footer, cl
     panelRef.current?.focus();
 
     const onKeyDown = (e) => {
-      if (e.key === 'Escape') onClose?.();
+      if (e.key === 'Escape') onCloseRef.current?.();
     };
     document.addEventListener('keydown', onKeyDown);
 
@@ -39,7 +53,7 @@ export function Dialog({ open, onClose, title, description, children, footer, cl
       document.body.style.overflow = prevOverflow;
       restoreRef.current?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 

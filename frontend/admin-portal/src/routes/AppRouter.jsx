@@ -36,18 +36,6 @@ const CertificateReview = lazyNamed(
 );
 const UsersList = lazyNamed(() => import('@/features/users/UsersList'), 'UsersList');
 const UserProfile = lazyNamed(() => import('@/features/users/UserProfile'), 'UserProfile');
-const NotificationsList = lazyNamed(
-  () => import('@/features/notifications/NotificationsList'),
-  'NotificationsList',
-);
-const NotificationDetail = lazyNamed(
-  () => import('@/features/notifications/NotificationDetail'),
-  'NotificationDetail',
-);
-const BroadcastForm = lazyNamed(
-  () => import('@/features/notifications/BroadcastForm'),
-  'BroadcastForm',
-);
 const ReportsPage = lazyNamed(() => import('@/features/reports/ReportsPage'), 'ReportsPage');
 const AuditLogPage = lazyNamed(() => import('@/features/audit/AuditLogPage'), 'AuditLogPage');
 const Help = lazyNamed(() => import('@/pages/Help'), 'Help');
@@ -69,14 +57,6 @@ const ProjectsAdmin = lazyNamed(
   'ProjectsAdmin',
 );
 const PollsAdmin = lazyNamed(() => import('@/features/governance/PollsAdmin'), 'PollsAdmin');
-const DocumentsAdmin = lazyNamed(
-  () => import('@/features/governance/DocumentsAdmin'),
-  'DocumentsAdmin',
-);
-const FeedbackAnalytics = lazyNamed(
-  () => import('@/features/governance/FeedbackAnalytics'),
-  'FeedbackAnalytics',
-);
 
 const page = (element) => <Suspense fallback={<LoadingScreen />}>{element}</Suspense>;
 
@@ -107,9 +87,6 @@ const router = createBrowserRouter([
           { path: 'dakhala/:id', element: page(<CertificateReview />) },
           { path: 'users', element: page(<UsersList />) },
           { path: 'users/:id', element: page(<UserProfile />) },
-          { path: 'notifications', element: page(<NotificationsList />) },
-          { path: 'notifications/broadcast', element: page(<BroadcastForm />) },
-          { path: 'notifications/:id', element: page(<NotificationDetail />) },
           { path: 'reports', element: page(<ReportsPage />) },
           { path: 'audit', element: page(<AuditLogPage />) },
           { path: 'village', element: page(<VillageProfilePage />) },
@@ -118,8 +95,6 @@ const router = createBrowserRouter([
           { path: 'timetable', element: page(<TimetableAdmin />) },
           { path: 'projects', element: page(<ProjectsAdmin />) },
           { path: 'polls', element: page(<PollsAdmin />) },
-          { path: 'documents', element: page(<DocumentsAdmin />) },
-          { path: 'feedback', element: page(<FeedbackAnalytics />) },
           { path: 'help', element: page(<Help />) },
           { path: '*', element: page(<NotFound />) },
         ],

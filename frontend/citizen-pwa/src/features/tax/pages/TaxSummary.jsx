@@ -39,7 +39,7 @@ export function TaxSummary() {
 
   return (
     <div className="dgp-page-wide">
-      <ModuleHeader art={TaxMotif} title={t('tax.summary.title')} />
+      <ModuleHeader backTo="/" art={TaxMotif} title={t('tax.summary.title')} />
 
       {isLoading ? (
         <SkeletonList />
@@ -53,9 +53,16 @@ export function TaxSummary() {
         <EmptyState art={NoTaxArt} title={t('tax.summary.empty')} />
       ) : (
         <>
-          {/* The one number this page exists to answer. */}
+          {/*
+            The one number this page exists to answer.
+
+            It used to centre itself inside the page (`sm:mx-auto sm:max-w-md`) while the
+            record cards below filled the full grid, so the two blocks started at different
+            left edges with a band of empty space between them. Both now share the page's
+            single content container and the same left edge.
+          */}
           <div
-            className={`mb-4 rounded-xl border p-5 text-center sm:mx-auto sm:max-w-md ${
+            className={`mb-4 rounded-xl border p-5 ${
               settled
                 ? 'border-success/20 bg-success-subtle'
                 : 'border-primary/20 bg-primary-subtle'

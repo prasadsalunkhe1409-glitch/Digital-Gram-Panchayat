@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Plus, Megaphone, Pencil, Trash2, Send, Archive } from 'lucide-react';
+import { Plus, Megaphone, Pencil, Trash2, Archive } from 'lucide-react';
 import { formatDate } from '@dgp/shared';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/table';
 import { useNotices, useNoticeMutations } from './hooks';
 import { ConfirmDialog } from './ConfirmDialog';
-import { BroadcastDialog } from './BroadcastDialog';
 
 const LIMIT = 20;
 const COLS = 5;
@@ -33,7 +32,6 @@ export function NoticesList() {
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const [toDelete, setToDelete] = useState(null);
-  const [toBroadcast, setToBroadcast] = useState(null);
 
   const params = { page, limit: LIMIT, ...(q ? { q } : {}) };
   const { data, isLoading, isError } = useNotices(params);
@@ -61,16 +59,6 @@ export function NoticesList() {
       toast.error(t('notice.toast.actionFailed'));
     } finally {
       setToDelete(null);
-    }
-  };
-
-  const doBroadcast = async (payload) => {
-    try {
-      const res = await m.broadcast.mutateAsync({ id: toBroadcast.id, payload });
-      toast.success(t('notice.toast.broadcastSent', { count: res.recipientCount }));
-      setToBroadcast(null);
-    } catch (err) {
-      toast.error(err.response?.data?.error?.message || t('notice.toast.actionFailed'));
     }
   };
 
@@ -173,15 +161,6 @@ export function NoticesList() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={t('notice.dash.broadcast')}
-                        title={t('notice.dash.broadcast')}
-                        onClick={() => setToBroadcast(n)}
-                      >
-                        <Send className="h-4 w-4" aria-hidden="true" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
                         aria-label={t('notice.dash.delete')}
                         title={t('notice.dash.delete')}
                         onClick={() => setToDelete(n)}
@@ -212,14 +191,6 @@ export function NoticesList() {
         danger
         onConfirm={confirmDelete}
         onCancel={() => setToDelete(null)}
-      />
-
-      <BroadcastDialog
-        open={Boolean(toBroadcast)}
-        notice={toBroadcast}
-        isPending={m.broadcast.isPending}
-        onBroadcast={doBroadcast}
-        onClose={() => setToBroadcast(null)}
       />
 
       <div className="mt-6 flex items-center gap-2 text-caption text-muted-foreground">

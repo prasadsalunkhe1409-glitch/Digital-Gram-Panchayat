@@ -30,7 +30,7 @@ export function SchemeList() {
 
   return (
     <div className="dgp-page-wide">
-      <ModuleHeader art={SchemeMotif} title={t('scheme.list.title')} />
+      <ModuleHeader backTo="/" art={SchemeMotif} title={t('scheme.list.title')} />
 
       <div className="mb-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
         <div className="relative sm:max-w-sm sm:flex-1">

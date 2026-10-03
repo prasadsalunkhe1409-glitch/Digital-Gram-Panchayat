@@ -2,7 +2,9 @@ import tailwindcssAnimate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class',
+  // Light theme only: no dark CSS, no `dark:` utilities, and an impossible selector so
+  // the OS preference can never switch anything.
+  darkMode: ['selector', '[data-theme="never"]'],
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     container: {
@@ -17,6 +19,16 @@ export default {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         surface: 'hsl(var(--surface))',
+        gold: {
+          DEFAULT: 'hsl(var(--accent-gold))',
+          hover: 'hsl(var(--accent-gold-hover))',
+          foreground: 'hsl(var(--accent-gold-foreground))',
+        },
+        interactive: {
+          DEFAULT: 'hsl(var(--interactive))',
+          strong: 'hsl(var(--interactive-strong))',
+          foreground: 'hsl(var(--interactive-foreground))',
+        },
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           hover: 'hsl(var(--primary-hover))',

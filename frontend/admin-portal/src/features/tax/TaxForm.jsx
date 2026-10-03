@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { UserCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { TAX_TYPES } from '@dgp/shared';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input, Select } from '@/components/ui/input';
 import { PageHeader } from '@/components/PageHeader';
-import { taxService } from './taxService';
+import { CitizenSearch } from '@/components/CitizenSearch';
 import { useTaxMutations } from './hooks';
 
 /** Label + control + error, in the order every form on the portal uses. */
@@ -33,8 +32,6 @@ export function TaxForm() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [citizen, setCitizen] = useState(null);
-  const [mobile, setMobile] = useState('');
-  const [lookingUp, setLookingUp] = useState(false);
   const [bills, setBills] = useState([]);
   const [billError, setBillError] = useState(null);
   const m = useTaxMutations();
@@ -44,23 +41,6 @@ export function TaxForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({ defaultValues: { taxType: 'Property', financialYear: '2025-2026' } });
-
-  const lookup = async () => {
-    if (!/^[6-9]\d{9}$/.test(mobile)) {
-      toast.error(t('tax.form.badMobile'));
-      return;
-    }
-    setLookingUp(true);
-    try {
-      const found = await taxService.lookupCitizen(mobile);
-      setCitizen(found);
-    } catch (err) {
-      setCitizen(null);
-      toast.error(err.response?.data?.error?.message || t('tax.form.citizenNotFound'));
-    } finally {
-      setLookingUp(false);
-    }
-  };
 
   const onSubmit = async (values) => {
     if (!citizen) {
@@ -89,34 +69,8 @@ export function TaxForm() {
 
       {/* A bill can't be raised against nobody — the citizen is resolved before the form matters. */}
       <Card className="mb-4">
-        <CardContent className="space-y-1.5">
-          <label htmlFor="tax-mobile" className="block text-label text-foreground">
-            {t('tax.form.citizenMobile')}
-          </label>
-          <div className="flex gap-2">
-            <Input
-              id="tax-mobile"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              inputMode="numeric"
-              placeholder="9876543210"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={lookup}
-              loading={lookingUp}
-              className="shrink-0"
-            >
-              {t('tax.form.lookup')}
-            </Button>
-          </div>
-          {citizen ? (
-            <p className="flex items-center gap-1.5 pt-1 text-body text-success-strong">
-              <UserCheck className="h-4 w-4" aria-hidden="true" />
-              {citizen.fullName} · {citizen.mobile}
-            </p>
-          ) : null}
+        <CardContent>
+          <CitizenSearch value={citizen} onChange={setCitizen} />
         </CardContent>
       </Card>
 

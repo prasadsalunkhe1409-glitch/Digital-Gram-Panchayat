@@ -82,6 +82,12 @@ describe('MobileSidebar', () => {
     const hrefs = within(dialog)
       .getAllByRole('link')
       .map((a) => a.getAttribute('href'));
+    // Notifications, Documents and Feedback were removed from the officer portal: the
+    // notification centre duplicated Notices, and neither Download Centre nor Feedback
+    // had a place in the officer's day. Their absence is asserted, not just unlisted.
+    expect(hrefs).not.toContain('/notifications');
+    expect(hrefs).not.toContain('/documents');
+    expect(hrefs).not.toContain('/feedback');
     expect(hrefs).toEqual([
       '/',
       '/complaints',
@@ -90,7 +96,6 @@ describe('MobileSidebar', () => {
       '/tax',
       '/schemes',
       '/users',
-      '/notifications',
       '/reports',
       '/audit',
       '/village',
@@ -101,8 +106,6 @@ describe('MobileSidebar', () => {
       '/timetable',
       '/projects',
       '/polls',
-      '/documents',
-      '/feedback',
       '/help',
     ]);
   });

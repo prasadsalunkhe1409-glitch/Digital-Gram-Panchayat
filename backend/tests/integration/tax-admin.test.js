@@ -71,24 +71,28 @@ async function makeRecord(token, citizenId, over = {}) {
 }
 
 describe('officer tax lookup', () => {
-  test('finds a citizen by mobile', async () => {
+  // The endpoint takes a fragment of a name or number now and returns a shortlist. The full
+  // behaviour is covered in tax-citizen-search.test.js; these two keep the contract this
+  // suite already relied on honest.
+  test('finds a citizen by their full mobile', async () => {
     const token = await officer();
     await citizen('9811110011');
     const res = await request(app)
-      .get('/api/v1/admin/tax/lookup?mobile=9811110011')
+      .get('/api/v1/admin/tax/lookup?q=9811110011')
       .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
-    expect(res.body.data.mobile).toBe('9811110011');
-    expect(res.body.data.fullName).toBe('Ramesh');
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].mobile).toBe('9811110011');
+    expect(res.body.data[0].fullName).toBe('Ramesh');
   });
 
-  test('unknown mobile -> 404', async () => {
+  test('no match is an empty shortlist, not a 404', async () => {
     const token = await officer();
     const res = await request(app)
-      .get('/api/v1/admin/tax/lookup?mobile=9700000000')
+      .get('/api/v1/admin/tax/lookup?q=9700000000')
       .set('Authorization', `Bearer ${token}`);
-    expect(res.status).toBe(404);
-    expect(res.body.error.code).toBe('CITIZEN_NOT_FOUND');
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual([]);
   });
 });
 

@@ -44,7 +44,8 @@ export function useReviewMutations(id) {
 export function useOfficerCreateCertificate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ values, files }) => certificateService.officerCreate(values, files),
+    mutationFn: ({ values, files, certificate }) =>
+      certificateService.officerCreate(values, files, certificate),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-dakhala'] }),
   });
 }

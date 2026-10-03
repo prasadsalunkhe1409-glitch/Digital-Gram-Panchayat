@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 
 /**
  * Every officer governance screen must tell an officer the difference between "there is
- * nothing here" and "we could not load it". Before this, all five rendered the empty state on
+ * nothing here" and "we could not load it". Before this, each rendered the empty state on
  * a failed query — an officer would read "No meetings yet" when the truth was that the API was
  * unreachable, and would have no reason to retry.
  *
@@ -19,8 +19,6 @@ const { state, noMutations } = vi.hoisted(() => {
       meetings: idle(),
       projects: idle(),
       polls: idle(),
-      documents: idle(),
-      feedback: idle(),
     },
     noMutations: () => ({
       create: { mutate: () => {}, isPending: false },
@@ -34,27 +32,19 @@ vi.mock('@/features/governance/hooks', () => ({
   useAdminMeetings: () => state.meetings,
   useAdminProjects: () => state.projects,
   useAdminPolls: () => state.polls,
-  useAdminDocuments: () => state.documents,
-  useAdminFeedback: () => state.feedback,
-  useFeedbackAnalytics: () => state.feedback,
   useMeetingMutations: noMutations,
   useProjectMutations: noMutations,
   usePollMutations: noMutations,
-  useDocumentMutations: noMutations,
 }));
 
 import { MeetingsAdmin } from '@/features/governance/MeetingsAdmin';
 import { ProjectsAdmin } from '@/features/governance/ProjectsAdmin';
 import { PollsAdmin } from '@/features/governance/PollsAdmin';
-import { DocumentsAdmin } from '@/features/governance/DocumentsAdmin';
-import { FeedbackAnalytics } from '@/features/governance/FeedbackAnalytics';
 
 const SCREENS = [
   ['Gram Sabha', MeetingsAdmin, 'meetings', 'Could not load meetings', 'No meetings yet'],
   ['Works', ProjectsAdmin, 'projects', 'Could not load works', 'No works yet'],
   ['Polls', PollsAdmin, 'polls', 'Could not load polls', 'No polls yet'],
-  ['Documents', DocumentsAdmin, 'documents', 'Could not load documents', 'No documents yet'],
-  ['Feedback', FeedbackAnalytics, 'feedback', 'Could not load feedback', null],
 ];
 
 const reset = () => {

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Check, X, FileText, Eye, BadgeCheck } from 'lucide-react';
+import { X, FileText, Eye, BadgeCheck, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatDateTime, formatDate } from '@dgp/shared';
 import { Button } from '@/components/ui/button';
@@ -32,11 +32,19 @@ export function CertificateReview() {
   const { data: a, isLoading, isError } = useApplication(id);
   const m = useReviewMutations(id);
   const [rejectOpen, setRejectOpen] = useState(false);
-  const [confirmApprove, setConfirmApprove] = useState(false);
   const [preview, setPreview] = useState(null);
-  // Officer edits applied just before the certificate is generated.
+  // Officer corrections, and the prepared certificate they are issuing.
   const [edits, setEdits] = useState({});
   const [remarks, setRemarks] = useState('');
+  const [certFile, setCertFile] = useState(null);
+
+  // The officer corrects the submitted details in place, so the fields are seeded as soon as
+  // the application loads rather than behind a "start review" step.
+  useEffect(() => {
+    if (!a) return;
+    setEdits({ ...(a.applicationData || {}) });
+    setRemarks(a.officerRemarks || '');
+  }, [a]);
 
   if (isLoading) return <p className="text-body text-muted-foreground">{t('common.loading')}</p>;
   if (isError || !a)
@@ -44,17 +52,21 @@ export function CertificateReview() {
 
   const pending = a.status === 'Submitted' || a.status === 'UnderReview';
 
-  const startApprove = () => {
-    setEdits({ ...(a.applicationData || {}) });
-    setRemarks(a.officerRemarks || '');
-    setConfirmApprove(true);
-  };
-
   const doApprove = async () => {
+    // The officer issues a document they prepared and signed; there is nothing to generate,
+    // so there is nothing to issue without it. The API enforces the same rule.
+    if (!certFile) {
+      toast.error(t('dakhala.review.certificateRequired'));
+      return;
+    }
     try {
-      await m.approve.mutateAsync({ applicationData: edits, officerRemarks: remarks });
+      await m.approve.mutateAsync({
+        applicationData: edits,
+        officerRemarks: remarks,
+        file: certFile,
+      });
       toast.success(t('dakhala.review.approved'));
-      setConfirmApprove(false);
+      setCertFile(null);
     } catch (err) {
       toast.error(err.response?.data?.error?.message || t('dakhala.review.actionFailed'));
     }
@@ -133,14 +145,28 @@ export function CertificateReview() {
                             {t(`dakhala.docGroup.${d.group}`, d.group)}
                           </p>
                         ) : null}
-                        <button
-                          type="button"
-                          onClick={() => setPreview(d)}
-                          className="mt-1 inline-flex items-center gap-1 text-caption font-medium text-primary transition-colors duration-150 hover:text-primary-hover"
-                        >
-                          <Eye className="h-3 w-3" aria-hidden="true" />
-                          {t('doc.view')}
-                        </button>
+                        {/* View and download only — a citizen's evidence is never editable
+                            or replaceable from here. */}
+                        <div className="mt-1 flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setPreview(d)}
+                            className="inline-flex items-center gap-1 text-caption font-medium text-primary transition-colors duration-150 hover:text-primary-hover"
+                          >
+                            <Eye className="h-3 w-3" aria-hidden="true" />
+                            {t('doc.view')}
+                          </button>
+                          <a
+                            href={d.url}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-caption font-medium text-primary transition-colors duration-150 hover:text-primary-hover"
+                          >
+                            <Download className="h-3 w-3" aria-hidden="true" />
+                            {t('doc.download')}
+                          </a>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -151,19 +177,29 @@ export function CertificateReview() {
             </CardContent>
           </Panel>
 
-          {a.status === 'Approved' && a.pdfUrl ? (
-            <Panel title={t('dakhala.review.pdf')}>
-              <CardContent className="space-y-3 p-5">
-                {a.certificateNumber ? (
+          {/*
+            The final certificate, as its own step. It is always present so the officer can see
+            at a glance whether one has been issued, and so the act of issuing is visibly an
+            upload of a document they prepared — not a button that manufactures one.
+          */}
+          <Panel title={t('dakhala.review.issuedSection')}>
+            <CardContent className="space-y-3 p-5">
+              {a.status === 'Approved' && a.pdfUrl ? (
+                <>
+                  <p className="text-body font-medium text-success-strong">
+                    {t('dakhala.review.statusIssued')}
+                  </p>
                   <dl className="space-y-1.5">
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-caption text-muted-foreground">
-                        {t('dakhala.review.certNumber')}
-                      </dt>
-                      <dd className="text-caption font-medium tabular-nums text-foreground">
-                        {a.certificateNumber}
-                      </dd>
-                    </div>
+                    {a.certificateNumber ? (
+                      <div className="flex justify-between gap-3">
+                        <dt className="text-caption text-muted-foreground">
+                          {t('dakhala.review.certNumber')}
+                        </dt>
+                        <dd className="text-caption font-medium tabular-nums text-foreground">
+                          {a.certificateNumber}
+                        </dd>
+                      </div>
+                    ) : null}
                     {a.issuedAt ? (
                       <div className="flex justify-between gap-3">
                         <dt className="text-caption text-muted-foreground">
@@ -175,24 +211,76 @@ export function CertificateReview() {
                       </div>
                     ) : null}
                   </dl>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPreview({
-                      url: a.pdfUrl,
-                      type: 'pdf',
-                      name: `${a.certificateNumber || a.applicationId}.pdf`,
-                    })
-                  }
-                  className="inline-flex items-center gap-2 text-body font-medium text-primary transition-colors duration-150 hover:text-primary-hover"
-                >
-                  <Eye className="h-4 w-4" aria-hidden="true" />
-                  {t('dakhala.review.openPdf')}
-                </button>
-              </CardContent>
-            </Panel>
-          ) : null}
+                  <div className="flex flex-wrap items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPreview({
+                          url: a.pdfUrl,
+                          type: 'pdf',
+                          name: `${a.certificateNumber || a.applicationId}.pdf`,
+                        })
+                      }
+                      className="inline-flex items-center gap-2 text-body font-medium text-primary transition-colors duration-150 hover:text-primary-hover"
+                    >
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                      {t('dakhala.review.openPdf')}
+                    </button>
+                    <a
+                      href={a.pdfUrl}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-body font-medium text-primary transition-colors duration-150 hover:text-primary-hover"
+                    >
+                      <Download className="h-4 w-4" aria-hidden="true" />
+                      {t('dakhala.review.downloadPdf')}
+                    </a>
+                  </div>
+                </>
+              ) : pending ? (
+                <>
+                  <p className="text-body text-muted-foreground">
+                    {t('dakhala.review.statusNotIssued')}
+                  </p>
+                  <label className="block space-y-1">
+                    <span className="block text-label text-foreground">
+                      {t('dakhala.review.certificateFile')}
+                    </span>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      className={cn(controlClass, 'h-auto py-2 file:mr-3 file:border-0')}
+                      onChange={(e) => setCertFile(e.target.files?.[0] ?? null)}
+                    />
+                    <span className="block text-caption text-muted-foreground">
+                      {t('dakhala.review.certificateFileHint')}
+                    </span>
+                  </label>
+
+                  {/* The officer should be able to confirm they picked the right file. */}
+                  {certFile ? (
+                    <p className="flex items-center gap-2 text-body text-foreground">
+                      <FileText className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                      <span className="truncate font-medium">{certFile.name}</span>
+                      <span className="shrink-0 text-caption text-muted-foreground">
+                        {Math.ceil(certFile.size / 1024)} KB
+                      </span>
+                    </p>
+                  ) : null}
+
+                  <Button onClick={doApprove} loading={m.approve.isPending} disabled={!certFile}>
+                    <BadgeCheck className="h-4 w-4" aria-hidden="true" />
+                    {t('dakhala.review.issue')}
+                  </Button>
+                </>
+              ) : (
+                <p className="text-body text-muted-foreground">
+                  {t('dakhala.review.statusNoCertificate')}
+                </p>
+              )}
+            </CardContent>
+          </Panel>
 
           {a.status === 'Rejected' && a.rejectionReason ? (
             <div
@@ -208,79 +296,60 @@ export function CertificateReview() {
         <div className="space-y-4">
           {pending ? (
             <Panel title={t('dakhala.review.decision')}>
-              <CardContent className="p-5">
-                {confirmApprove ? (
-                  <div className="space-y-3">
+              <CardContent className="space-y-3 p-5">
+                <p className="text-caption text-muted-foreground">
+                  {t('dakhala.review.reviewBeforeIssue')}
+                </p>
+                <div className="space-y-2.5">
+                  {Object.keys(edits).length === 0 ? (
                     <p className="text-caption text-muted-foreground">
-                      {t('dakhala.review.reviewBeforeIssue')}
+                      {t('dakhala.review.noFields')}
                     </p>
-                    <div className="space-y-2.5">
-                      {Object.keys(edits).length === 0 ? (
-                        <p className="text-caption text-muted-foreground">
-                          {t('dakhala.review.noFields')}
-                        </p>
-                      ) : (
-                        Object.entries(edits).map(([key, value]) => (
-                          <label key={key} className="block space-y-1">
-                            <span className="block text-label text-foreground">
-                              {t(`dakhala.field.${key}`, key)}
-                            </span>
-                            <input
-                              className={controlClass}
-                              value={value ?? ''}
-                              onChange={(e) => setEdits((p) => ({ ...p, [key]: e.target.value }))}
-                            />
-                          </label>
-                        ))
-                      )}
-                      <label className="block space-y-1">
+                  ) : (
+                    Object.entries(edits).map(([key, value]) => (
+                      <label key={key} className="block space-y-1">
                         <span className="block text-label text-foreground">
-                          {t('dakhala.review.remarks')}
+                          {t(`dakhala.field.${key}`, key)}
                         </span>
-                        <textarea
-                          rows={2}
-                          className={cn(controlClass, 'h-auto min-h-16 py-2.5')}
-                          placeholder={t('dakhala.review.remarksHint')}
-                          value={remarks}
-                          onChange={(e) => setRemarks(e.target.value)}
+                        <input
+                          className={controlClass}
+                          value={value ?? ''}
+                          onChange={(e) => setEdits((prev) => ({ ...prev, [key]: e.target.value }))}
                         />
                       </label>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={doApprove} loading={m.approve.isPending}>
-                        <BadgeCheck className="h-4 w-4" aria-hidden="true" />
-                        {t('dakhala.review.generateApprove')}
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setConfirmApprove(false)}>
-                        {t('dakhala.review.cancel')}
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  /*
-                   * Approve is the decision this screen exists for, so it is the only filled
-                   * button. Reject stays — it is a real outcome and the backend and the
-                   * historical Rejected records both depend on it — but as a quiet ghost
-                   * action, separated by a rule, so the two no longer read as equals.
-                   */
-                  <div className="flex flex-col gap-3">
-                    <Button size="lg" onClick={startApprove}>
-                      <Check className="h-4 w-4" aria-hidden="true" />
-                      {t('dakhala.review.approve')}
-                    </Button>
-                    <div className="border-t border-border pt-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full text-destructive-strong hover:bg-destructive-subtle"
-                        onClick={() => setRejectOpen(true)}
-                      >
-                        <X className="h-4 w-4" aria-hidden="true" />
-                        {t('dakhala.review.reject')}
-                      </Button>
-                    </div>
-                  </div>
-                )}
+                    ))
+                  )}
+                  <label className="block space-y-1">
+                    <span className="block text-label text-foreground">
+                      {t('dakhala.review.remarks')}
+                    </span>
+                    <textarea
+                      rows={2}
+                      className={cn(controlClass, 'h-auto min-h-16 py-2.5')}
+                      placeholder={t('dakhala.review.remarksHint')}
+                      value={remarks}
+                      onChange={(e) => setRemarks(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                {/*
+                  Issuing happens in the Final Certificate section, because it is an upload
+                  rather than a decision taken here. Reject stays — it is a real outcome the
+                  API and the historical Rejected records both depend on — but as a quiet
+                  action, so the two never read as equals.
+                */}
+                <div className="border-t border-border pt-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-destructive-strong hover:bg-destructive-subtle"
+                    onClick={() => setRejectOpen(true)}
+                  >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                    {t('dakhala.review.reject')}
+                  </Button>
+                </div>
               </CardContent>
             </Panel>
           ) : (

@@ -15,18 +15,28 @@
 @layer base {
   :root {
     /* Surfaces — page #F5F7FA, cards #FFFFFF, secondary surface / hover #F1F5F9. */
-    --background: 216 33% 97%; /* #F5F7FA */
+    --background: 213 30% 93%; /* #E7ECF2 */
     --foreground: 222 47% 11%; /* #0F172A */
-    --card: 0 0% 100%;
+    --card: 42 45% 96%; /* #F9F6EF — warm paper, the surface content sits on */
     --card-foreground: 222 47% 11%;
     /* Raised/sunken band between page and card — for section separation and inner wells. */
-    --surface: 214 38% 95%; /* #EEF2F7 */
+    --surface: 213 28% 89%; /* sunken band, now distinct from both page and card */
 
     /* Brand — royal blue #1E3A8A, hover #1B3378, light tint #DBEAFE (also selected-row wash). */
-    --primary: 224 64% 33%; /* #1E3A8A */
-    --primary-hover: 224 64% 27%; /* darker #1E3A8A */
+    --primary: 224 64% 33%; /* #1E3B8B — 8.6:1 on the page, 9.5:1 on a card */
+    --primary-hover: 224 64% 27%; /* #17306F */
     --primary-foreground: 0 0% 100%;
-    --primary-subtle: 214 95% 93%; /* #DBEAFE */
+    --primary-subtle: 212 100% 93%; /* #DAEBFF — pale blue: icon wells, selected rows */
+
+    /* The public portal's call to action — "Enter portal", and the few other actions a
+       visitor is meant to take before they have an account. Gold on near-black ink, never
+       the reverse: #0F172A on #FBBF24 measures 9.9:1, while white on it is 1.9:1 and
+       unreadable. Reserved for that one job — never for a destructive action, an error, or
+       an ordinary table control, where it would read as a warning. */
+    --accent-gold: 42 98% 57%; /* #FDBD26 */
+    --accent-gold-hover: 38 95% 50%; /* darker #FDBD26 */
+    --accent-gold-foreground: 222 47% 11%; /* #0F172A */
+
 
     /* Neutrals — #334155 slate, #F1F5F9 surface-secondary, #475569/#64748B text. */
     --secondary: 210 40% 96%; /* #F1F5F9 */
@@ -36,10 +46,24 @@
     /* #607085. Was 47% (#64748B), picked for 4.6:1 "on white" — but secondary text sits on
        --background (#F8FAFC), not white, where it measured 4.38:1 and failed WCAG AA.
        45% gives 4.83:1 on the page and 5.06:1 on a card: passes on both surfaces. */
-    --muted-foreground: 215 16% 45%;
+    --muted-foreground: 215 16% 41%; /* #586679 — 4.92:1 page, 5.42:1 card, 4.82:1 pale */
     --body-foreground: 215 19% 35%; /* #475569 — 7.4:1, for body copy */
     --accent: 210 40% 96%; /* #F1F5F9 — hover surface */
     --accent-foreground: 222 47% 11%;
+
+    /*
+     * Interactive blue, in two values because one cannot do both jobs.
+     *
+     * #3774E7 is the design palette's interactive colour and is used where contrast is
+     * judged against the 3:1 non-text rule — icon accents, focus rings, control borders.
+     * As *text* it measures 3.68:1 on the page and 4.05:1 on a card, so a link or a white
+     * label on a #3774E7 fill would fail WCAG AA. `--interactive-strong` is the same hue
+     * darkened until it passes everywhere it carries words: 5.20:1 on the page, 5.72:1 on a
+     * card, and 6.17:1 under white text.
+     */
+    --interactive: 219 79% 56%; /* #3774E7 — fills, icons, focus */
+    --interactive-strong: 219 79% 46%; /* #1959D2 — links, and any fill under white text */
+    --interactive-foreground: 0 0% 100%;
 
     /* Teal — a rarely-used informational highlight (#0F766E). */
     --teal: 175 77% 26%;
@@ -64,9 +88,15 @@
     --info-strong: 224 76% 42%;
     --pending: 38 92% 50%; /* #F59E0B */
 
-    --border: 214 32% 91%; /* #E2E8F0 */
-    --input: 214 32% 88%;
-    --ring: 221 83% 53%; /* #2563EB — focus ring is deliberately the secondary blue */
+    --border: 212 33% 89%; /* #D9E2EC */
+    /* Form-control boundary, not decoration. --border may stay as light as the design asks
+       because a card edge is separation; an input's edge is the only thing telling a citizen
+       where the field is, which WCAG 1.4.11 holds to 3:1. #D7DFEA measured 1.34:1 against
+       white and failed. The page is darker now (#E7ECF2), so the value is set against the
+       harder of the two surfaces: #6D84A2 measures 3.56:1 on a warm card and 3.23:1 on the
+       page. */
+    --input: 214 22% 53%; /* #6D84A2 */
+    --ring: 219 79% 56%; /* #3774E7 — the palette's interactive blue */
     --radius: 0.625rem; /* 10px — sm 6, md 8, lg 10, xl 14 */
   }
   * {

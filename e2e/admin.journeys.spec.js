@@ -57,29 +57,6 @@ test('admin resolves a complaint', async ({ page }) => {
   }
 });
 
-test('admin approves a certificate', async ({ page }) => {
-  await login(page);
-  await page.goto('/dakhala');
-  const first = page.getByRole('link', { name: /DKH-/ }).first();
-  if (await first.count()) {
-    await first.click();
-    const approve = page.getByRole('button', { name: /approve/i });
-    if (await approve.count()) {
-      await approve.click();
-      await expect(page.getByText(/approved/i).first()).toBeVisible();
-    }
-  }
-});
-
-test('admin sends a broadcast notification', async ({ page }) => {
-  await login(page);
-  await page.goto('/notifications/broadcast');
-  await page.getByLabel(/title/i).fill('E2E Broadcast');
-  await page.getByLabel(/message/i).fill('This is an end-to-end broadcast test.');
-  await page.getByRole('button', { name: /send|broadcast/i }).click();
-  await expect(page.getByText(/sent|broadcast/i).first()).toBeVisible();
-});
-
 test('admin toggles a user account status', async ({ page }) => {
   await login(page);
   await page.goto('/users');
@@ -94,27 +71,34 @@ test('admin toggles a user account status', async ({ page }) => {
 });
 
 /**
- * Publishing a document is the officer portal's simplest real upload, and until now uploads
- * were only ever exercised through the API contract and the multer middleware — never through
- * the actual form. The buffer starts with %PDF- because the upload path verifies magic bytes,
- * so a file whose contents contradict its declared type is rejected before the service sees it.
+ * Issuing a certificate is now the officer portal's real upload, and the only end-to-end
+ * exercise of a file travelling from a form to storage. It replaces the Download Centre
+ * test, which drove a screen this phase removed.
+ *
+ * The buffer starts with %PDF- because the upload path verifies magic bytes: a file whose
+ * contents contradict its declared type is rejected before the service sees it.
  */
-test('admin publishes a document through the upload form', async ({ page }) => {
+test('admin issues a certificate by uploading the prepared document', async ({ page }) => {
   await login(page);
-  await page.goto('/documents');
+  await page.goto('/dakhala');
 
-  const title = `E2E circular ${Date.now()}`;
-  await page.getByRole('button', { name: /add document/i }).click();
+  const first = page.getByRole('link', { name: /DKH-/ }).first();
+  if (!(await first.count())) return; // nothing awaiting a decision in this run
+  await first.click();
 
-  const dialog = page.getByRole('dialog');
-  await dialog.getByLabel(/title/i).fill(title);
-  await dialog.getByLabel(/^file$/i).setInputFiles({
-    name: 'circular.pdf',
+  const approve = page.getByRole('button', { name: /approve/i });
+  if (!(await approve.count())) return; // already decided
+  await approve.click();
+
+  // The decision panel asks for the prepared certificate and will not submit without it.
+  const file = page.locator('input[type="file"]');
+  await expect(file).toBeVisible();
+  await file.setInputFiles({
+    name: 'certificate.pdf',
     mimeType: 'application/pdf',
     buffer: Buffer.from('%PDF-1.4'),
   });
-  await dialog.getByRole('button', { name: /save/i }).click();
 
-  // The row appearing in the table is proof the file reached storage and the record was written.
-  await expect(page.getByText(title)).toBeVisible();
+  await page.getByRole('button', { name: /issue/i }).click();
+  await expect(page.getByText(/issued/i).first()).toBeVisible();
 });

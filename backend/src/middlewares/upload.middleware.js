@@ -125,6 +125,64 @@ export function uploadCertificateDocuments(req, res, next) {
 }
 
 /**
+ * Certificate issuance at the counter: up to 5 supporting documents under `documents`, plus
+ * the single prepared certificate the officer issues, under `certificate`.
+ *
+ * The two fields are held to different rules on purpose. A citizen's supporting document is
+ * usually a phone photograph of a paper record, so images are accepted there. The issued
+ * certificate is the official artefact and must be a PDF: an image of a certificate is not a
+ * certificate, and once stored it is what the citizen downloads forever after.
+ *
+ * The declared type is only the claim. `verifyUploadedFiles` then reads the leading bytes, so
+ * a JPEG renamed to .pdf is rejected before the service ever sees it.
+ */
+const issuedCertificateUpload = multer({
+  storage,
+  limits: { fileSize: MAX_UPLOAD_SIZE_BYTES },
+  fileFilter(_req, file, cb) {
+    if (file.fieldname === 'certificate') {
+      if (file.mimetype === 'application/pdf') {
+        cb(null, true);
+        return;
+      }
+      cb(new AppError(400, 'INVALID_FILE_TYPE', 'The certificate must be a PDF'));
+      return;
+    }
+    if (ALLOWED_ATTACHMENT_MIME.has(file.mimetype)) {
+      cb(null, true);
+      return;
+    }
+    cb(new AppError(400, 'INVALID_FILE_TYPE', 'Attachment must be a PDF or image'));
+  },
+});
+
+export function uploadIssuedCertificate(req, res, next) {
+  const handler = issuedCertificateUpload.fields([
+    { name: 'documents', maxCount: 5 },
+    { name: 'certificate', maxCount: 1 },
+  ]);
+  handler(req, res, (err) => {
+    if (!err) {
+      verifyUploadedFiles(req, res, next);
+      return;
+    }
+    if (err instanceof AppError) {
+      next(err);
+      return;
+    }
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      next(new AppError(400, 'FILE_TOO_LARGE', 'Each file must be 5MB or smaller'));
+      return;
+    }
+    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      next(new AppError(400, 'TOO_MANY_FILES', 'You can upload at most 5 documents'));
+      return;
+    }
+    next(new AppError(400, 'UPLOAD_ERROR', 'Upload failed'));
+  });
+}
+
+/**
  * Accept up to 5 tax-bill scans (PDF/image, <=5MB each) under `bills`. Reuses the shared
  * attachment upload — no duplicate upload logic. No-ops on JSON requests (backward compatible).
  */

@@ -57,14 +57,6 @@ const ApplicationDetail = lazyNamed(
   () => import('@/features/dakhala/pages/ApplicationDetail'),
   'ApplicationDetail',
 );
-const NotificationCenter = lazyNamed(
-  () => import('@/features/notifications/pages/NotificationCenter'),
-  'NotificationCenter',
-);
-const NotificationDetail = lazyNamed(
-  () => import('@/features/notifications/pages/NotificationDetail'),
-  'NotificationDetail',
-);
 const NotificationSettings = lazyNamed(
   () => import('@/features/notifications/pages/NotificationSettings'),
   'NotificationSettings',
@@ -115,9 +107,7 @@ const router = createBrowserRouter([
           { path: 'dakhala', element: page(<ApplicationList />) },
           { path: 'dakhala/new', element: page(<ApplyCertificate />) },
           { path: 'dakhala/:id', element: page(<ApplicationDetail />) },
-          { path: 'notifications', element: page(<NotificationCenter />) },
           { path: 'notifications/settings', element: page(<NotificationSettings />) },
-          { path: 'notifications/:id', element: page(<NotificationDetail />) },
           { path: 'settings', element: page(<Settings />) },
           { path: 'help', element: page(<Help />) },
           { path: 'profile', element: page(<Profile />) },

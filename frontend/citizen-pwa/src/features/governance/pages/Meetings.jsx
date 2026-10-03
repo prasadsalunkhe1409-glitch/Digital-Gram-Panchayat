@@ -159,7 +159,7 @@ export function Meetings() {
 
   return (
     <div className="dgp-page">
-      <PageHeader title={t('meeting.title')} subtitle={t('meeting.intro')} />
+      <PageHeader backTo="/" title={t('meeting.title')} subtitle={t('meeting.intro')} />
 
       {isLoading ? (
         <SkeletonList count={3} />

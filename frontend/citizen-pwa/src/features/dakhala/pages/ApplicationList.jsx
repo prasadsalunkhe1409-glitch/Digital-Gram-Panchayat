@@ -21,6 +21,7 @@ export function ApplicationList() {
   return (
     <div className="dgp-page-wide">
       <ModuleHeader
+        backTo="/"
         art={CertificateMotif}
         title={t('dakhala.list.title')}
         action={

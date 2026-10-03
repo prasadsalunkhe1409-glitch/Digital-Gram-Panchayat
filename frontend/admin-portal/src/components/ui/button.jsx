@@ -21,13 +21,22 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Navy: the decision on a screen.
         default: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary-hover',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/70',
+        // The palette's interactive blue, at the darkened value — white on #3774E7 itself is
+        // 4.37:1 and fails AA, while `interactive-strong` measures 6.17:1.
+        secondary:
+          'bg-interactive-strong text-interactive-foreground shadow-xs hover:bg-interactive-strong/90',
+        // Gold carries dark ink, never white: ink measures 10.6:1 on it, white 1.7:1.
+        accent: 'bg-gold text-gold-foreground shadow-xs hover:bg-gold-hover',
+        // The old neutral fill, kept for the quiet actions that used `secondary` as a wash.
+        muted: 'bg-secondary text-secondary-foreground hover:bg-secondary/70',
         destructive: 'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90',
         outline:
           'border border-input bg-card shadow-xs hover:bg-accent hover:text-accent-foreground',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
+        // A link is text, so it uses the value that passes as text on both surfaces.
+        link: 'text-interactive-strong underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-12 px-5 py-2',

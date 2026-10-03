@@ -3,7 +3,10 @@ import { ROLES } from '@dgp/shared';
 import { authenticate } from '../../middlewares/auth.middleware.js';
 import { authorize } from '../../middlewares/role.middleware.js';
 import { validate } from '../../middlewares/validate.middleware.js';
-import { uploadCertificateDocuments } from '../../middlewares/upload.middleware.js';
+import {
+  uploadCertificateDocuments,
+  uploadIssuedCertificate,
+} from '../../middlewares/upload.middleware.js';
 import { certificateLimiter, generalLimiter } from '../../middlewares/rate-limit.middleware.js';
 import * as controller from './certificate.controller.js';
 import {
@@ -45,16 +48,22 @@ export const adminDakhalaRouter = Router();
 adminDakhalaRouter.use(authenticate, authorize(ROLES.OFFICER));
 
 adminDakhalaRouter.get('/', listQueryValidation, validate, controller.adminList);
-// Same upload middleware as the citizen route, so the magic-byte check still runs.
+// Supporting documents plus the prepared certificate; same magic-byte check either way.
 adminDakhalaRouter.post(
   '/',
-  uploadCertificateDocuments,
+  uploadIssuedCertificate,
   officerCreateValidation,
   validate,
   controller.officerCreate,
 );
 adminDakhalaRouter.get('/:id', idParamValidation, validate, controller.adminGetOne);
 adminDakhalaRouter.patch('/:id/review', idParamValidation, validate, controller.review);
-adminDakhalaRouter.patch('/:id/approve', idParamValidation, validate, controller.approve);
+adminDakhalaRouter.patch(
+  '/:id/approve',
+  uploadIssuedCertificate,
+  idParamValidation,
+  validate,
+  controller.approve,
+);
 adminDakhalaRouter.patch('/:id/reject', rejectValidation, validate, controller.reject);
 adminDakhalaRouter.delete('/:id', idParamValidation, validate, controller.remove);

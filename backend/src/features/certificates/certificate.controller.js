@@ -40,10 +40,14 @@ export const review = asyncHandler(async (req, res) => {
 });
 
 export const approve = asyncHandler(async (req, res) => {
-  const app = await service.approve(req.params.id, req.user.id, {
-    applicationData: req.body?.applicationData,
-    officerRemarks: req.body?.officerRemarks,
-  });
+  // `fields()` upload, so the prepared certificate arrives under req.files.certificate.
+  const [certificate] = req.files?.certificate ?? [];
+  const app = await service.approve(
+    req.params.id,
+    req.user.id,
+    { applicationData: req.body?.applicationData, officerRemarks: req.body?.officerRemarks },
+    certificate ?? null,
+  );
   res.status(200).json(successResponse(app));
 });
 
@@ -73,7 +77,8 @@ export const officerCreate = asyncHandler(async (req, res) => {
       await service.createByOfficer({
         officerId: req.user.id,
         body: req.body,
-        files: req.files,
+        files: req.files?.documents ?? [],
+        certificateFile: (req.files?.certificate ?? [])[0] ?? null,
       }),
     ),
   );
